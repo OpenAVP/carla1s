@@ -50,7 +50,7 @@ class Context:
 
         self._client: Optional[carla.Client] = None
         self._actors = list()
-        
+
         self.logger = self._create_logger() if logger is None else logger
     
     def __enter__(self) -> 'Context':
@@ -76,6 +76,13 @@ class Context:
         else:
             self.logger.info('Context exit.')
         return None
+
+    @property
+    def initialized(self) -> bool:
+        """
+        :return: 当前上下文是否已经通过 with 语句初始化.
+        """
+        return self._initialized
     
     @property
     def client(self) -> carla.Client:
@@ -150,3 +157,7 @@ class Context:
             return False
         finally:
             self.client.set_timeout(self._timeout_sec)
+
+    @context_func
+    def test(self):
+        self.logger.info('OK')
