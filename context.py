@@ -52,7 +52,7 @@ class Context:
         return self._client
     
     @property
-    def actor(self) -> list:
+    def actors(self) -> list:
         """
         :return: 当前上下文中的所有 Actor 实例.
         """
