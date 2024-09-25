@@ -150,8 +150,3 @@ class Context:
             return False
         finally:
             self.client.set_timeout(self._timeout_sec)
-
-    @context_func
-    def test(self, a: int, b: int) -> int:
-        print(f'test: {a} + {b}')
-        return a + b
