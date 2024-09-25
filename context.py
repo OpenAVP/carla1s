@@ -88,13 +88,12 @@ class Context:
         """
         self._client = None
         
-    def destroy_all_actors(self) -> None:
+    def destroy_all_actors(self) -> 'Context':
         """
         销毁当前上下文中的所有 Actor 实例.
         :return: None.
         """
-        cmd = [carla.command.DestroyActor(x) for x in self.__actor_registry]
-        self.client.apply_batch_sync(cmd)
+        raise NotImplementedError
 
     def test_connection(self, test_timeout_sec: float = 0.1) -> bool:
         """
