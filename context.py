@@ -90,6 +90,14 @@ class Context:
         :return: 当前上下文中的 CARLA 客户端实例.
         """
         return self._client
+
+    @property
+    @context_func
+    def world(self) -> carla.World:
+        """
+        :return: 当前上下文中的 CARLA 世界实例. 该实例可能会因为地图切换而发生变化.
+        """
+        return self.client.get_world()
     
     @property
     def actors(self) -> list:
