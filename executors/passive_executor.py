@@ -33,7 +33,7 @@ class PassiveExecutor(Executor):
                             f'so nothing will happen.')
 
     def spin(self, show_progress: bool = False):
-        self.logger.info('Continue spin for KeyboardInterrupt signal.')
+        self.logger.info('Continue spin until KeyboardInterrupt signal received (press Ctrl-C to stop).')
         logger = self.logger.info if show_progress else self.logger.debug
         time_begin_spin = time.perf_counter()
         try:
@@ -42,7 +42,7 @@ class PassiveExecutor(Executor):
                 time_passed = time.perf_counter() - time_begin_spin
                 logger(f'Continue spinning: keep {time_passed:.4f} seconds.')
         except KeyboardInterrupt:
-            self.logger.info('Received KeyboardInterrupt signal, stop spinning.')
+            self.logger.warning('Received KeyboardInterrupt signal, stop spinning.')
 
     def wait_real_seconds(self, seconds: float, show_progress: bool = False):
         self.logger.info(f'Waiting for {seconds} seconds in real world.')
