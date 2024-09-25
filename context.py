@@ -4,6 +4,8 @@ from functools import wraps
 from typing import Optional, NamedTuple
 from rich.logging import RichHandler
 
+from .exceptions import ContextError
+
 
 def context_func(method):
     """
@@ -61,9 +63,9 @@ class Context:
         try:
             self.connect()
             self.logger.info('Context begin.')
-        except RuntimeError:
-            self.logger.error('Context begin with exception.', exc_info=True)
-            self.logger.error('Context is not going to be established.')
+        except RuntimeError as e:
+            self.logger.critical('Context initialization failed due to connection error.', exc_info=e)
+            raise ContextError('Context initialization failed due to connection error.') from e
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
