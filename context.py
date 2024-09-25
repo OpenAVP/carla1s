@@ -1,8 +1,25 @@
 import carla
 import logging
+from functools import wraps
 from typing import Optional, NamedTuple
 from rich.logging import RichHandler
 
+
+def context_func(method):
+    """
+    将一个方法包装为上下文方法, 该方法只有在上下文初始化且对 CARLA 连接成功时才会执行.
+    """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        if not self._initialized:
+            self.logger.warning(f'Method {method.__name__}() skipped because the context is not initialized, '
+                                f'use with statement to initialize the context.')
+            return None
+        if not self.test_connection():
+            self.logger.warning(f'Method {method.__name__}() skipped because the CARLA connection is not established.')
+            return None
+        return method(self, *args, **kwargs)
+    return wrapper
 
 class Context:
     """
@@ -29,19 +46,35 @@ class Context:
         self._timeout_sec = timeout_sec
         self._log_level = log_level
 
+        self._initialized = False
+
         self._client: Optional[carla.Client] = None
         self._actors = list()
         
         self.logger = self._create_logger() if logger is None else logger
     
     def __enter__(self) -> 'Context':
-        self.logger.info('Context begin.')
-        self.connect()
+        # 只有当程序使用 with 语句时, 才会标记 _initialized 为 True
+        self._initialized = True
+
+        # 尝试连接到 CARLA 服务端
+        try:
+            self.connect()
+            self.logger.info('Context begin.')
+        except RuntimeError:
+            self.logger.error('Context begin with exception.', exc_info=True)
+            self.logger.error('Context is not going to be established.')
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        still_connected = self.test_connection()
         self.disconnect()
-        self.logger.info('Context end.')
+        if exc_type is not None:
+            self.logger.error('Context exit with exception.', exc_info=(exc_type, exc_val, exc_tb))
+        elif not still_connected:
+            self.logger.warning('Context exit with failed connection.')
+        else:
+            self.logger.info('Context exit.')
         return None
     
     @property
@@ -74,12 +107,18 @@ class Context:
         执行与 CARLA 服务端的连接.
         :return: 链式调用.
         """
+        # 如果 CARLA 客户端已经存在并且可以被连接, 则直接返回
+        if self.client is not None and self.test_connection():
+            return self
+
         # 构造 CARLA 客户端实例
         self._client = carla.Client(host=self._host, port=self._port)
         self._client.set_timeout(self._timeout_sec)
         
         # 测试与 CARLA 服务端的连接
-        self._client.get_server_version()
+        if not self.test_connection():
+            raise RuntimeError(f'Failed to connect to CARLA server at {self._host}:{self._port}.')
+        return self
         
     def disconnect(self) -> 'Context':
         """
@@ -111,3 +150,8 @@ class Context:
             return False
         finally:
             self.client.set_timeout(self._timeout_sec)
+
+    @context_func
+    def test(self, a: int, b: int) -> int:
+        print(f'test: {a} + {b}')
+        return a + b
