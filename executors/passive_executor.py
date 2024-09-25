@@ -1,7 +1,7 @@
 import time
-from threading import Thread
 
 from .executor import Executor
+from ..logger import ProgressLogger
 
 
 class PassiveExecutor(Executor):
@@ -47,64 +47,52 @@ class PassiveExecutor(Executor):
     def wait_real_seconds(self, seconds: float, show_progress: bool = False):
         self.logger.info(f'Waiting for {seconds} seconds in real world.')
         time_begin_wait = time.perf_counter()
-        logger = self.logger.info if show_progress else self.logger.debug
-        flag_show_log = True
 
-        def _progress_logger():
-            while flag_show_log:
-                time.sleep(1)
-                if not flag_show_log:
-                    break
-                now_wait = time.perf_counter() - time_begin_wait
-                logger(f'Waiting for {seconds} seconds in real world: progress: {now_wait:.3f} / {seconds:.3f}' )
+        progress = ProgressLogger(
+            logger=self.logger.info if show_progress else self.logger.debug,
+            header='Waiting for seconds',
+            unit='seconds',
+            total=seconds,
+        ).start()
 
-        thread_log = Thread(target=_progress_logger, daemon=True)
-        thread_log.start()
-
-        time.sleep(seconds)
-        flag_show_log=False
-        return
+        time_spent = time.perf_counter() - time_begin_wait
+        while time_spent < seconds:
+            time.sleep(0.001)
+            progress.update(time_spent)
+        else:
+            progress.stop()
 
     def wait_sim_seconds(self, seconds: float, show_progress: bool = False):
         self.logger.info(f'Waiting for {seconds} seconds in simulation world')
         time_begin_wait = self.context.world.get_snapshot().timestamp.elapsed_seconds
-        logger = self.logger.info if show_progress else self.logger.debug
-        flag_show_log = True
 
-        def _progress_logger():
-            while flag_show_log:
-                time.sleep(1)
-                if not flag_show_log:
-                    break
-                now_wait = self.context.world.get_snapshot().timestamp.elapsed_seconds - time_begin_wait
-                logger(f'Waiting for {seconds} seconds in simulation world: progress: {now_wait:.3f} / {seconds:.3f}' )
+        progress = ProgressLogger(
+            logger=self.logger.info if show_progress else self.logger.debug,
+            header='Waiting for seconds',
+            unit='seconds',
+            total=seconds,
+        ).start()
 
-        thread_log = Thread(target=_progress_logger, daemon=True)
-        thread_log.start()
-
-        while self.context.world.get_snapshot().timestamp.elapsed_seconds - time_begin_wait < seconds:
+        time_spent = self.context.world.get_snapshot().timestamp.elapsed_seconds - time_begin_wait
+        while time_spent < seconds:
             time.sleep(0.001)  # 防止 CPU 过载
-        flag_show_log = False
-        return
+            progress.update(time_spent)
+        else:
+            progress.stop()
 
     def wait_ticks(self, ticks: int, show_progress: bool = False):
         self.logger.info(f'Waiting for {ticks} ticks.')
         count_wait_ticks = 0
-        logger = self.logger.info if show_progress else self.logger.debug
-        flag_show_log = True
 
-        def _progress_logger():
-            while flag_show_log:
-                time.sleep(1)
-                if not flag_show_log:
-                    break
-                logger(f'Waiting for {ticks} ticks: progress: {count_wait_ticks} / {ticks}')
-
-        thread_log = Thread(target=_progress_logger, daemon=True)
-        thread_log.start()
+        progress = ProgressLogger(
+            logger=self.logger.info if show_progress else self.logger.debug,
+            header='Waiting for ticks',
+            unit='ticks',
+            total=ticks,
+        ).start()
 
         for _ in range(ticks):
             count_wait_ticks += 1
             self.context.world.wait_for_tick()
-        flag_show_log = False
-        return
+        else:
+            progress.stop()
