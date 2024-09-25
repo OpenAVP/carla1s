@@ -32,6 +32,18 @@ class PassiveExecutor(Executor):
         self.logger.warning(f'You are trying to tick the CARLA server in Passive Executor, '
                             f'so nothing will happen.')
 
+    def spin(self, show_progress: bool = False):
+        self.logger.info('Continue spin for KeyboardInterrupt signal.')
+        logger = self.logger.info if show_progress else self.logger.debug
+        count = 0
+        try:
+            while True:
+                time.sleep(1)
+                count += 1
+                logger(f'Continue spinning: keep {count} seconds.')
+        except KeyboardInterrupt:
+            self.logger.info('Received KeyboardInterrupt signal, stop spinning.')
+
     def wait_real_seconds(self, seconds: float, show_progress: bool = False):
         self.logger.info(f'Waiting for {seconds} seconds in real world.')
         start_wait = time.perf_counter()

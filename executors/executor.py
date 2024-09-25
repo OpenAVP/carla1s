@@ -49,6 +49,15 @@ class Executor(ABC):
 
     @abstractmethod
     @context_func
+    def spin(self, show_progress: bool = False):
+        """
+        阻塞当前线程, 直到接收到 KeyboardInterrupt 信号.
+        :param show_progress: 打印等待进度日志. True 时在 INFO 级别打印, False 时在 DEBUG 级别打印.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    @context_func
     def wait_real_seconds(self, seconds: float, show_progress: bool = False):
         """
         等待一定真实世界的秒数.
