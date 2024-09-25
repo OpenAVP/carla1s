@@ -87,6 +87,7 @@ class Context:
         :return: 链式调用.
         """
         self._client = None
+        return self
         
     def destroy_all_actors(self) -> 'Context':
         """
