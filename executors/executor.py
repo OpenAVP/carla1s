@@ -41,21 +41,40 @@ class Executor(ABC):
     @abstractmethod
     @context_func
     def tick(self):
+        """
+        要求 CARLA 仿真器进行一次 ``tick()``.
+        :return:
+        """
         raise NotImplementedError
 
     @abstractmethod
     @context_func
-    def wait_real_seconds(self, seconds: float):
+    def wait_real_seconds(self, seconds: float, show_progress: bool = False):
+        """
+        等待一定真实世界的秒数.
+        :param seconds: 需要等待的真实时间的秒数.
+        :param show_progress: 打印等待进度日志. True 时在 INFO 级别打印, False 时在 DEBUG 级别打印.
+        """
         raise NotImplementedError
 
     @abstractmethod
     @context_func
-    def wait_sim_seconds(self, seconds: float):
+    def wait_sim_seconds(self, seconds: float, show_progress: bool = False):
+        """
+        等待一定的仿真世界的秒数.
+        :param seconds: 需要等待的仿真时间的秒数.
+        :param show_progress: 打印等待进度日志. True 时在 INFO 级别打印, False 时在 DEBUG 级别打印.
+        """
         raise NotImplementedError
 
     @abstractmethod
     @context_func
-    def wait_ticks(self, ticks: int):
+    def wait_ticks(self, ticks: int, show_progress: bool = False):
+        """
+        等待一定的 Tick 次数.
+        :param ticks: CARLA 服务端执行的 Tick 数
+        :param show_progress: 打印等待进度日志. True 时在 INFO 级别打印, False 时在 DEBUG 级别打印.
+        """
         raise NotImplementedError
 
     @context_func

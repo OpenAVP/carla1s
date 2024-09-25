@@ -33,11 +33,6 @@ class PassiveExecutor(Executor):
                             f'so nothing will happen.')
 
     def wait_real_seconds(self, seconds: float, show_progress: bool = False):
-        """
-        等待一定真实世界的秒数.
-        :param seconds: 需要等待的真实时间的秒数.
-        :param show_progress: 打印等待进度日志. True 时在 INFO 级别打印, False 时在 DEBUG 级别打印.
-        """
         self.logger.info(f'Waiting for {seconds} seconds in real world.')
         start_wait = time.perf_counter()
         logger = self.logger.info if show_progress else self.logger.debug
@@ -59,11 +54,6 @@ class PassiveExecutor(Executor):
         return
 
     def wait_sim_seconds(self, seconds: float, show_progress: bool = False):
-        """
-        等待一定的仿真世界的秒数.
-        :param seconds: 需要等待的仿真时间的秒数.
-        :param show_progress: 打印等待进度日志. True 时在 INFO 级别打印, False 时在 DEBUG 级别打印.
-        """
         self.logger.info(f'Waiting for {seconds} seconds in simulation world')
         start_wait = self.context.world.get_snapshot().timestamp.elapsed_seconds
         logger = self.logger.info if show_progress else self.logger.debug
@@ -86,11 +76,6 @@ class PassiveExecutor(Executor):
         return
 
     def wait_ticks(self, ticks: int, show_progress: bool = False):
-        """
-        等待一定的 Tick 次数.
-        :param ticks: CARLA 服务端执行的 Tick 数
-        :param show_progress: 打印等待进度日志. True 时在 INFO 级别打印, False 时在 DEBUG 级别打印.
-        """
         self.logger.info(f'Waiting for {ticks} ticks.')
         wait_count = 0
         logger = self.logger.info if show_progress else self.logger.debug
