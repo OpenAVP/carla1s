@@ -32,7 +32,7 @@ class Context:
                  host: str = '127.0.0.1',
                  port: int = 2000,
                  timeout_sec: float = 1.0,
-                 log_level: int = logging.INFO,
+                 log_level: int = logging.DEBUG,
                  logger: Optional[logging.Logger] = None) -> None:
         """
         :param host: CARLA 服务端的 IP 地址.
