@@ -95,3 +95,19 @@ class Context:
         """
         cmd = [carla.command.DestroyActor(x) for x in self.__actor_registry]
         self.client.apply_batch_sync(cmd)
+
+    def test_connection(self, test_timeout_sec: float = 0.1) -> bool:
+        """
+        测试与 CARLA 服务端的连接.
+        :return: None.
+        """
+        if self.client is None:
+            return False
+        try:
+            self.client.set_timeout(test_timeout_sec)
+            self.client.get_server_version()
+            return True
+        except RuntimeError:
+            return False
+        finally:
+            self.client.set_timeout(self._timeout_sec)
