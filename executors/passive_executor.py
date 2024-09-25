@@ -35,76 +35,76 @@ class PassiveExecutor(Executor):
     def spin(self, show_progress: bool = False):
         self.logger.info('Continue spin for KeyboardInterrupt signal.')
         logger = self.logger.info if show_progress else self.logger.debug
-        count = 0
+        time_begin_spin = time.perf_counter()
         try:
             while True:
                 time.sleep(1)
-                count += 1
-                logger(f'Continue spinning: keep {count} seconds.')
+                time_passed = time.perf_counter() - time_begin_spin
+                logger(f'Continue spinning: keep {time_passed:.4f} seconds.')
         except KeyboardInterrupt:
             self.logger.info('Received KeyboardInterrupt signal, stop spinning.')
 
     def wait_real_seconds(self, seconds: float, show_progress: bool = False):
         self.logger.info(f'Waiting for {seconds} seconds in real world.')
-        start_wait = time.perf_counter()
+        time_begin_wait = time.perf_counter()
         logger = self.logger.info if show_progress else self.logger.debug
-        show = True
+        flag_show_log = True
 
         def _progress_logger():
-            while show:
+            while flag_show_log:
                 time.sleep(1)
-                if not show:
+                if not flag_show_log:
                     break
-                now_wait = time.perf_counter() - start_wait
+                now_wait = time.perf_counter() - time_begin_wait
                 logger(f'Waiting for {seconds} seconds in real world: progress: {now_wait:.3f} / {seconds:.3f}' )
 
-        thread = Thread(target=_progress_logger, daemon=True)
-        thread.start()
+        thread_log = Thread(target=_progress_logger, daemon=True)
+        thread_log.start()
 
         time.sleep(seconds)
-        show=False
+        flag_show_log=False
         return
 
     def wait_sim_seconds(self, seconds: float, show_progress: bool = False):
         self.logger.info(f'Waiting for {seconds} seconds in simulation world')
-        start_wait = self.context.world.get_snapshot().timestamp.elapsed_seconds
+        time_begin_wait = self.context.world.get_snapshot().timestamp.elapsed_seconds
         logger = self.logger.info if show_progress else self.logger.debug
-        show = True
+        flag_show_log = True
 
         def _progress_logger():
-            while show:
+            while flag_show_log:
                 time.sleep(1)
-                if not show:
+                if not flag_show_log:
                     break
-                now_wait = self.context.world.get_snapshot().timestamp.elapsed_seconds - start_wait
+                now_wait = self.context.world.get_snapshot().timestamp.elapsed_seconds - time_begin_wait
                 logger(f'Waiting for {seconds} seconds in simulation world: progress: {now_wait:.3f} / {seconds:.3f}' )
 
-        thread = Thread(target=_progress_logger, daemon=True)
-        thread.start()
+        thread_log = Thread(target=_progress_logger, daemon=True)
+        thread_log.start()
 
-        while self.context.world.get_snapshot().timestamp.elapsed_seconds - start_wait < seconds:
+        while self.context.world.get_snapshot().timestamp.elapsed_seconds - time_begin_wait < seconds:
             time.sleep(0.001)  # 防止 CPU 过载
-        show = False
+        flag_show_log = False
         return
 
     def wait_ticks(self, ticks: int, show_progress: bool = False):
         self.logger.info(f'Waiting for {ticks} ticks.')
-        wait_count = 0
+        count_wait_ticks = 0
         logger = self.logger.info if show_progress else self.logger.debug
-        show = True
+        flag_show_log = True
 
         def _progress_logger():
-            while show:
+            while flag_show_log:
                 time.sleep(1)
-                if not show:
+                if not flag_show_log:
                     break
-                logger(f'Waiting for {ticks} ticks: progress: {wait_count} / {ticks}' )
+                logger(f'Waiting for {ticks} ticks: progress: {count_wait_ticks} / {ticks}')
 
-        thread = Thread(target=_progress_logger, daemon=True)
-        thread.start()
+        thread_log = Thread(target=_progress_logger, daemon=True)
+        thread_log.start()
 
         for _ in range(ticks):
-            wait_count += 1
+            count_wait_ticks += 1
             self.context.world.wait_for_tick()
-        show = False
+        flag_show_log = False
         return
