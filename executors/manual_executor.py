@@ -83,20 +83,6 @@ class ManualExecutor(Executor):
         new_val = self._min_tick_wait_seconds
         self.logger.warning(f'Min tick wait seconds changed from {old_val} to {new_val}, input: {value}.')
 
-    def _set_min_tick_wait_seconds(self, value: float):
-        """
-        设置最小等待时间.
-        :param value: 如果输入值小于 0.0, 则设置为 0.0;
-            如果输入值等于 0.0, 则设置为 ``fixed_delta_seconds`` 的值;
-            否则设置为输入值.
-        """
-        if value < 0.0:
-            self._min_tick_wait_seconds = 0.0
-        elif value == 0.0:
-            self._min_tick_wait_seconds = self.fixed_delta_seconds
-        else:
-            self._min_tick_wait_seconds = value
-
     def tick(self):
         # 计算需要等待的时间
         delta_tick_seconds = time.perf_counter() - self._last_tick
@@ -207,3 +193,17 @@ class ManualExecutor(Executor):
         self.context.world.apply_settings(setting)
         self.context.world.tick()
         self.logger.info(f'Set synchronous mode to {option}.')
+
+    def _set_min_tick_wait_seconds(self, value: float):
+        """
+        设置最小等待时间.
+        :param value: 如果输入值小于 0.0, 则设置为 0.0;
+            如果输入值等于 0.0, 则设置为 ``fixed_delta_seconds`` 的值;
+            否则设置为输入值.
+        """
+        if value < 0.0:
+            self._min_tick_wait_seconds = 0.0
+        elif value == 0.0:
+            self._min_tick_wait_seconds = self.fixed_delta_seconds
+        else:
+            self._min_tick_wait_seconds = value
