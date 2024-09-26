@@ -1,7 +1,7 @@
 import time
 
 from .executor import Executor
-from ..logger import ProgressLogger
+from ..utils.logger import ProgressLogger
 
 
 class PassiveExecutor(Executor):
