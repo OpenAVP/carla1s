@@ -32,20 +32,20 @@ class Point(Transform):
     @property
     def roll(self) -> float:
         """
-        :return: 点的 X 轴旋转角度, 由于点没有旋转, 因此返回 0
+        :return: 由于点没有旋转, 因此返回 0
         """
         return 0.0
 
     @property
     def pitch(self) -> float:
         """
-        :return: 点的 Y 轴旋转角度, 由于点没有旋转, 因此返回 0
+        :return: 由于点没有旋转, 因此返回 0
         """
         return 0.0
 
     @property
     def yaw(self) -> float:
         """
-        :return: 点的 Z 轴旋转角度, 由于点没有旋转, 因此返回 0
+        :return: 由于点没有旋转, 因此返回 0
         """
         return 0.0

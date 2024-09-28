@@ -19,9 +19,9 @@ class Transform:
         :param x: 表示物体在一个三维欧几里得空间中的 X 轴位置, 单位米, 右为正
         :param y: 表示物体在一个三维欧几里得空间中的 Y 轴位置, 单位米, 后为正
         :param z: 表示物体在一个三维欧几里得空间中的 Z 轴位置, 单位米, 上为正
-        :param yaw: 表示物体绕 Z 轴旋转的角度, 单位度, 角度制
-        :param pitch: 表示物体绕 Y 轴旋转的角度, 单位度, 角度制
-        :param roll: 表示物体绕 X 轴旋转的角度, 单位度, 角度制
+        :param yaw: 表示物体绕 Z 轴旋转的欧拉角, 单位度
+        :param pitch: 表示物体绕 Y 轴旋转的欧拉角, 单位度
+        :param roll: 表示物体绕 X 轴旋转的欧拉角, 单位度
 
         """
         # 将角度转换为弧度
@@ -90,7 +90,7 @@ class Transform:
     @property
     def yaw(self) -> float:
         """
-        :return: 物体绕 Z 轴旋转的角度, 单位度, 角度制, 由变换矩阵计算得到
+        :return: 物体绕 Z 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
         """
         # TODO: AI GENERATED CODE, VERIFY IT!
         return np.rad2deg(np.arctan2(self.matrix[1, 0], self.matrix[0, 0])).item()
@@ -98,7 +98,7 @@ class Transform:
     @property
     def pitch(self) -> float:
         """
-        :return: 物体绕 Y 轴旋转的角度, 单位度, 角度制, 由变换矩阵计算得到
+        :return: 物体绕 Y 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
         """
         # TODO: AI GENERATED CODE, VERIFY IT!
         return np.rad2deg(np.arcsin(-self.matrix[2, 0])).item()
@@ -106,7 +106,7 @@ class Transform:
     @property
     def roll(self) -> float:
         """
-        :return: 物体绕 X 轴旋转的角度, 单位度, 角度制, 由变换矩阵计算得到
+        :return: 物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
         """
         # TODO: AI GENERATED CODE, VERIFY IT!
         return np.rad2deg(np.arctan2(self.matrix[2, 1], self.matrix[2, 2])).item()
