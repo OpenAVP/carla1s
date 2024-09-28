@@ -10,7 +10,8 @@ class Transform:
                  *,
                  yaw: float = 0.0,
                  pitch: float = 0.0,
-                 roll: float = 0.0):
+                 roll: float = 0.0,
+                 matrix: np.ndarray = None):
         """
         变换的表示, 由位置和旋转组成.
 
@@ -22,8 +23,15 @@ class Transform:
         :param yaw: 表示物体绕 Z 轴旋转的欧拉角, 单位度
         :param pitch: 表示物体绕 Y 轴旋转的欧拉角, 单位度
         :param roll: 表示物体绕 X 轴旋转的欧拉角, 单位度
-
+        :param matrix: 变换矩阵, 4x4 的齐次变换矩阵, 如果提供了该参数, 则忽略其他参数
         """
+        # 如果提供了变换矩阵, 则直接使用
+        if matrix is not None:
+            if matrix.shape != (4, 4):
+                raise ValueError("The matrix must be a 4x4 matrix.")
+            self._matrix = matrix
+            return
+
         # 将角度转换为弧度
         yaw = np.deg2rad(yaw)
         pitch = np.deg2rad(pitch)
