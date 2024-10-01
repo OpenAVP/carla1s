@@ -52,7 +52,7 @@ class CoordConverter:
             """
             return self.data
 
-        def as_element(self) -> Union[Point, Transform]:
+        def as_single(self) -> Union[Point, Transform]:
             """
             :return: 以单个元素方式转换后的变换组
             """
