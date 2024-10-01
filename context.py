@@ -5,6 +5,7 @@ from typing import Optional, NamedTuple
 from rich.logging import RichHandler
 
 from .exceptions import ContextError
+from .utils import ProjectFormatter
 
 
 def context_func(method):
@@ -113,9 +114,10 @@ class Context:
         创建一个默认的 logging.Logger 实例, 并应用 RichHandler.
         :return: logging.Logger 实例.
         """
-        logger = logging.getLogger('carla1s')
+        logger = logging.getLogger('carla1s.Context')
         logger.setLevel(self._log_level)
-        handler = RichHandler(rich_tracebacks=True)
+        handler = RichHandler(rich_tracebacks=True, markup=True)
+        handler.setFormatter(ProjectFormatter('[on blue][%(shortname)s][/] %(message)s'))
         logger.addHandler(handler)
         return logger
     
