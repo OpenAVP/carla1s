@@ -1,12 +1,12 @@
 import carla
 import logging
 from functools import wraps
-from typing import Optional, NamedTuple
+from typing import Optional, NamedTuple, List
 from rich.logging import RichHandler
 
 from .errors import ContextError
 from .utils import ProjectFormatter
-from .actors import ActorFactory
+from .actors import ActorFactory, Actor
 
 
 def context_func(method):
@@ -53,10 +53,10 @@ class Context:
         self._initialized = False
 
         self._client: Optional[carla.Client] = None
-        self._actors = list()
+        self._actors: List[Actor] = list()
 
         self.logger = self._create_logger() if logger is None else logger
-        self.actor_factory = ActorFactory()
+        self.actor_factory = ActorFactory(self.actors)
     
     def __enter__(self) -> 'Context':
         # 只有当程序使用 with 语句时, 才会标记 _initialized 为 True
@@ -146,6 +146,7 @@ class Context:
         断开与 CARLA 服务端的连接.
         :return: 链式调用.
         """
+        self.destroy_all_actors()
         self._client = None
         return self
         
@@ -154,7 +155,9 @@ class Context:
         销毁当前上下文中的所有 Actor 实例.
         :return: None.
         """
-        raise NotImplementedError
+        for actor in self.actors:
+            actor.destroy()
+        return self
 
     def test_connection(self, test_timeout_sec: float = 0.1) -> bool:
         """

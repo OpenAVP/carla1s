@@ -1,6 +1,6 @@
 import carla
 from enum import Enum
-from typing import TypeVar, Type, Optional, Union
+from typing import TypeVar, Type, Optional, Union, List
 
 from .actor import Actor
 from ..tf import Transform
@@ -10,14 +10,21 @@ T = TypeVar('T', bound=Actor)
 
 class ActorFactory:
     
+    def __init__(self, ref_actor_list: List[Actor]) -> None:
+        self._ref_actor_list = ref_actor_list
+    
     class Builder:
-        def __init__(self, blueprint_name: str, actor_class: Type[T]):
+        def __init__(self, 
+                     blueprint_name: str, 
+                     actor_class: Type[T],
+                     ref_actor_list: List[Actor]):
             self._actor_class = actor_class
             self._blueprint_name = blueprint_name
             self._name = ''
             self._transform = Transform()
             self._parent = None
             self._attributes = {}
+            self._ref_actor_list = ref_actor_list
         
         def with_name(self, name: str) -> 'ActorFactory.Builder':
             self._name = name
@@ -72,13 +79,15 @@ class ActorFactory:
             return self
         
         def build(self) -> T:
-            return self._actor_class(
+            actor = self._actor_class(
                 blueprint_name=self._blueprint_name,
                 name=self._name,
                 transform=self._transform,
                 parent=self._parent,
                 attributes=self._attributes
             )
+            self._ref_actor_list.append(actor)
+            return actor
         
     def create(self, 
                actor_class: Type[T], 
@@ -92,4 +101,4 @@ class ActorFactory:
         else:
             blueprint_name = from_blueprint
         
-        return self.Builder(blueprint_name, actor_class)
+        return self.Builder(blueprint_name, actor_class, self._ref_actor_list)
