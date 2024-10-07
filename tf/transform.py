@@ -67,11 +67,6 @@ class Transform:
         """变换矩阵, 4x4 的齐次变换矩阵"""
         return self._matrix
 
-    @matrix.setter
-    def matrix(self, value: np.ndarray) -> None:
-        """变换矩阵, 4x4 的齐次变换矩阵"""
-        self._matrix = value
-
     @property
     def x(self) -> float:
         """物体在一个三维欧几里得空间中的 X 轴位置, 单位米, 右为正, 由变换矩阵计算得到"""
