@@ -14,7 +14,7 @@ class Actor:
     def __init__(self, 
                  blueprint_name: str,
                  name: str = '',
-                 transfrom: Transform = Transform(),
+                 transform: Transform = Transform(),
                  parent: Optional['Actor'] = None,
                  attributes: Dict[str, any] = {}) -> None:
         """ 初始化 Actor 对象
@@ -31,7 +31,7 @@ class Actor:
         self._entity: Optional[carla.Actor] = None
         self._blueprint_name = blueprint_name
         self._name = name
-        self._transform = transfrom
+        self._transform = transform
         self._parent = parent
         self._attributes = attributes
         self._setup = dict()
