@@ -1,6 +1,6 @@
 import carla
 from enum import Enum
-from typing import TypeVar, Type, Optional, Union, List
+from typing import TypeVar, Type, Optional, Union, List, Tuple
 
 from .actor import Actor
 from ..tf import Transform
@@ -90,6 +90,9 @@ class ActorFactory:
             )
             self._ref_actor_list.append(actor)
             return actor
+        
+        def build_many(self, count: int) -> Tuple[T]:
+            return tuple(self.build() for _ in range(count))
         
     def create(self, 
                actor_class: Type[T], 
