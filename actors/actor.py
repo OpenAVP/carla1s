@@ -94,7 +94,7 @@ class Actor:
         if self._name:
             return self._name
         # 否则, 返回默认名称
-        defualt_name = self._in_blueprint_name.split('.')[-1]
+        defualt_name = self._blueprint_name.split('.')[-1]
         defualt_name += f'#{self.id}'
         return defualt_name
     
