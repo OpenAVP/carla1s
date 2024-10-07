@@ -62,7 +62,7 @@ class ActorFactory:
                     roll=updates.get('roll', tf.roll)
                 )
     
-            self._transform = transform
+            self._transform = tf
             return self
         
         def with_parent(self, parent: Actor) -> 'ActorFactory.Builder':
