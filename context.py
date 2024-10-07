@@ -5,7 +5,7 @@ from typing import Optional, NamedTuple, List
 from rich.logging import RichHandler
 
 from .errors import ContextError
-from .utils import ProjectFormatter
+from .utils import ProjectFormatter, get_logger
 from .actors import ActorFactory, Actor
 
 
@@ -55,7 +55,11 @@ class Context:
         self._client: Optional[carla.Client] = None
         self._actors: List[Actor] = list()
 
-        self.logger = self._create_logger() if logger is None else logger
+        # LOGGING 
+        logging.basicConfig(level=log_level)
+        logging.getLogger().handlers.clear()
+        self.logger = get_logger('carla1s.Context') if logger is None else logger
+
         self.actor_factory = ActorFactory(self.actors)
     
     def __enter__(self) -> 'Context':
@@ -110,18 +114,6 @@ class Context:
         :return: 当前上下文中的所有 Actor 实例.
         """
         return self._actors
-            
-    def _create_logger(self) -> logging.Logger:
-        """
-        创建一个默认的 logging.Logger 实例, 并应用 RichHandler.
-        :return: logging.Logger 实例.
-        """
-        logger = logging.getLogger('carla1s.Context')
-        logger.setLevel(self._log_level)
-        handler = RichHandler(rich_tracebacks=True, markup=True)
-        handler.setFormatter(ProjectFormatter('[on blue][%(shortname)s][/] %(message)s'))
-        logger.addHandler(handler)
-        return logger
     
     def connect(self) -> 'Context':
         """

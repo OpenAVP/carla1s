@@ -5,6 +5,7 @@ from typing import Optional, Dict
 
 from ..errors import ContextError, CarlaError
 from ..tf import Transform
+from ..utils import get_logger
 
 
 class Actor:
@@ -36,7 +37,7 @@ class Actor:
         self._attributes = attributes
         self._setup = dict()
         # PUBLIC
-        self.logger = logging.getLogger(f'carla1s.actors.{self.name}')
+        self.logger = get_logger(f'carla1s.actors.{self.name}')
 
     @property
     def id(self) -> str:
@@ -94,8 +95,9 @@ class Actor:
         if self._name:
             return self._name
         # 否则, 返回默认名称
-        defualt_name = self._blueprint_name.split('.')[-1]
-        defualt_name += f'#{self.id}'
+        defualt_name = self._blueprint_name.split('.')[0]
+        defualt_name += f'-{self._blueprint_name.split(".")[-1]}'
+        defualt_name += f' | {self.id}'
         return defualt_name
     
     @name.setter
