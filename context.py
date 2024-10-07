@@ -179,7 +179,7 @@ class Context:
 
         return self
 
-    def get_spawn_points(self, index: int = 0) -> Transform:
+    def get_spawn_point(self, index: int = 0) -> Transform:
         """获取指定索引的 spawn point.
 
         Args:
