@@ -97,11 +97,14 @@ class Actor:
         """ Actor 的父 Actor."""
         return self._parent
 
-    def spawn(self, world: carla.World) -> None:
+    def spawn(self, world: carla.World) -> 'Actor':
         """ 在 CARLA 中生成 Actor 实体.
 
         Args:
             world (carla.World): 世界对象
+        
+        Returns:
+            Actor: 当前 Actor 对象, 用于链式调用
         """
         # 处理实体已经存在的情况
         if self._entity is not None:
@@ -141,10 +144,12 @@ class Actor:
         # Actor 生成成功后, 重新获取 logger 以更新名称
         self.logger = get_logger(f'carla1s.actors.{self.name}')
         self.logger.info(f'Actor {self.id} spawned.')
-            
+
         # 应用缓存的设置
         for setup, option in self._setup.items():
             getattr(self, setup)(option)
+            
+        return self
     
     def destroy(self) -> None:
         """ 销毁 Actor 实体.
@@ -169,11 +174,14 @@ class Actor:
             self._attributes[key] = value
             self.logger.debug(f'Set attribute "{key}={value}".')
 
-    def set_gravity(self, option: bool) -> None:
+    def set_gravity(self, option: bool) -> 'Actor':
         """ 设置 Actor 是否受重力影响.
 
         Args:
             option (bool): True 表示受重力影响, False 表示不受重力影响
+            
+        Returns:
+            Actor: 当前 Actor 对象, 用于链式调用
         """
         if self.is_alive:
             self.entity.set_enable_gravity(option)
@@ -181,12 +189,16 @@ class Actor:
         else:
             self._setup['set_gravity', option]
             self.logger.debug(f'Set actor gravity to {option}. Option will be applied after spawn.')
-
-    def set_physics(self, option: bool) -> None:
+        
+        return self
+    def set_physics(self, option: bool) -> 'Actor':
         """ 设置 Actor 是否受物理影响.
 
         Args:
             option (bool): True 表示受物理影响, False 表示不受物理影响
+            
+        Returns:
+            Actor: 当前 Actor 对象, 用于链式调用
         """
         if self.is_alive:
             self.entity.set_enable_physics(option)
@@ -194,19 +206,26 @@ class Actor:
         else:
             self._setup['set_physics'] = option
             self.logger.debug(f'Set actor physics to {option}. Option will be applied after spawn.')
+            
+        return self
     
-    def set_transform(self, transform: Transform) -> None:
+    def set_transform(self, transform: Transform) -> 'Actor':
         """ 设置 Actor 的变换.
                 
         如果 Actor 存在父 Actor, 该变换是相对父 Actor 的变换.
 
         Args:
             transform (Transform): 新的变换
+            
+        Returns:
+            Actor: 当前 Actor 对象, 用于链式调用
         """
         self.logger.info(f'Set actor transform to {transform}.')
         if self.is_alive:
             self.entity.set_transform(transform)
         self._transform = transform
+        
+        return self
             
     def get_transform(self, relative: bool = False) -> Transform:
         """ 获取 Actor 的变换. 

@@ -25,13 +25,27 @@ class Sensor(Actor):
         """Sensor 在 CARLA Server 中的实体, 只读."""
         return self._entity
     
-    def listen(self):
+    def spawn(self, world: carla.World) -> 'Sensor':
+        return super().spawn(world)
+
+    def set_gravity(self, option: bool) -> 'Sensor':
+        return super().set_gravity(option)
+
+    def set_physics(self, option: bool) -> 'Sensor':
+        return super().set_physics(option)
+
+    def set_transform(self, transform: Transform) -> 'Sensor':
+        return super().set_transform(transform)
+    
+    def listen(self) -> 'Sensor':
         """开始监听传感器数据."""
         self.entity.listen(self._callback)
-        
-    def stop(self):
+        return self
+
+    def stop(self) -> 'Sensor'  :
         """停止监听传感器数据."""
         self.entity.stop()
+        return self
     
     def _callback(self, data: carla.SensorData):
         pass
