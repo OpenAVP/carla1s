@@ -1,6 +1,6 @@
 import carla
 import logging
-from typing import Optional, NamedTuple, List
+from typing import Optional, List
 from rich.logging import RichHandler
 
 from .errors import ContextError
@@ -9,8 +9,7 @@ from .actors import ActorFactory, Actor
 
 
 class Context:
-    """
-    CARLA1S 的上下文聚合, 管理 CARLA 任务的生命周期.
+    """CARLA1S 的上下文聚合, 管理 CARLA 任务的生命周期.
 
     该类实现了上下文管理器协议, 可以使用 with 语句来管理 CARLA 任务的生命周期.
     """
@@ -21,12 +20,14 @@ class Context:
                  timeout_sec: float = 1.0,
                  log_level: int = logging.INFO,
                  logger: Optional[logging.Logger] = None) -> None:
-        """
-        :param host: CARLA 服务端的 IP 地址.
-        :param port: CARLA 服务端的端口号.
-        :param timeout_sec: CARLA 客户端的超时时间.
-        :param log_level: 日志记录的级别.
-        :param logger: 用于记录日志的 Logger 实例, 如果为 None, 则会创建一个新的 RichLogger 实例.
+        """初始化 Context 实例.
+
+        Args:
+            host (str, optional): CARLA 服务端的 IP 地址. 默认为 '127.0.0.1'.
+            port (int, optional): CARLA 服务端的端口号. 默认为 2000.
+            timeout_sec (float, optional): CARLA 客户端的超时时间. 默认为 1.0.
+            log_level (int, optional): 日志记录的级别. 默认为 logging.INFO.
+            logger (Optional[logging.Logger], optional): 用于记录日志的 Logger 实例. 如果为 None, 则会创建一个新的 RichLogger 实例. 默认为 None.
         """
         # PRIVATE
         self._host = host
@@ -67,36 +68,32 @@ class Context:
 
     @property
     def initialized(self) -> bool:
-        """
-        :return: 当前上下文是否已经通过 with 语句初始化.
-        """
+        """当前上下文是否已经通过 with 语句初始化."""
         return self._initialized
     
     @property
     def client(self) -> carla.Client:
-        """
-        :return: 当前上下文中的 CARLA 客户端实例.
-        """
+        """当前上下文中的 CARLA 客户端实例."""
         return self._client
 
     @property
     def world(self) -> carla.World:
-        """
-        :return: 当前上下文中的 CARLA 世界实例. 该实例可能会因为地图切换而发生变化.
-        """
+        """当前上下文中的 CARLA 世界实例. 该实例可能会因为地图切换而发生变化."""
         return self.client.get_world()
     
     @property
     def actors(self) -> list:
-        """
-        :return: 当前上下文中的所有 Actor 实例.
-        """
+        """当前上下文中的所有 Actor 实例."""
         return self._actors
     
     def connect(self) -> 'Context':
-        """
-        执行与 CARLA 服务端的连接.
-        :return: 链式调用.
+        """执行与 CARLA 服务端的连接.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+
+        Raises:
+            RuntimeError: 如果连接 CARLA 服务端失败.
         """
         # 如果 CARLA 客户端已经存在并且可以被连接, 则直接返回
         if self.client is not None and self.test_connection():
@@ -112,27 +109,33 @@ class Context:
         return self
         
     def disconnect(self) -> 'Context':
-        """
-        断开与 CARLA 服务端的连接.
-        :return: 链式调用.
+        """断开与 CARLA 服务端的连接.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
         """
         self.destroy_all_actors()
         self._client = None
         return self
         
     def destroy_all_actors(self) -> 'Context':
-        """
-        销毁当前上下文中的所有 Actor 实例.
-        :return: None.
+        """销毁当前上下文中的所有 Actor 实例.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
         """
         for actor in self.actors:
             actor.destroy()
         return self
 
     def test_connection(self, test_timeout_sec: float = 0.1) -> bool:
-        """
-        测试与 CARLA 服务端的连接.
-        :return: None.
+        """测试与 CARLA 服务端的连接.
+
+        Args:
+            test_timeout_sec (float, optional): 测试连接的超时时间. 默认为 0.1.
+
+        Returns:
+            bool: 如果连接成功返回 True, 否则返回 False.
         """
         if self.client is None:
             return False
