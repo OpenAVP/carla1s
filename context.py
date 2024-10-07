@@ -6,6 +6,7 @@ from .errors import ContextError
 from .utils import get_logger
 from .actors import ActorFactory, Actor
 from .registry import AvailableActors, AvailableMaps, AvailableVehicles, AvailableSensors
+from .tf import Transform
 
 
 class Context:
@@ -177,3 +178,15 @@ class Context:
             self._actors = list()
 
         return self
+
+    def get_spawn_points(self, index: int = 0) -> Transform:
+        """获取指定索引的 spawn point.
+
+        Args:
+            index (int, optional): spawn point 的索引. 默认为 0.
+
+        Returns:
+            Transform: 指定索引的 spawn point.
+        """
+        carla_tf = self.world.get_spawn_points()[index]
+        return Transform.from_carla_transform(carla_tf)
