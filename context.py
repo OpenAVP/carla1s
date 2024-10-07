@@ -41,7 +41,7 @@ class Context:
         # LOGGING 
         logging.basicConfig(level=log_level)
         logging.getLogger().handlers.clear()
-        self.logger = get_logger('carla1s.Context') if logger is None else logger
+        self.logger = get_logger('carla1s.context') if logger is None else logger
         
         # PUBLIC
         self.actor_factory = ActorFactory(self.actors)
@@ -188,5 +188,5 @@ class Context:
         Returns:
             Transform: 指定索引的 spawn point.
         """
-        carla_tf = self.world.get_spawn_points()[index]
-        return Transform.from_carla_transform(carla_tf)
+        carla_tf = self.world.get_map().get_spawn_points()[index]
+        return Transform.from_carla_transform_obj(carla_tf)
