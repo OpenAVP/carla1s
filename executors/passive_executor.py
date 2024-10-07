@@ -16,7 +16,7 @@ class PassiveExecutor(Executor):
         self.logger.info('Passive Executor begin.')
 
         # 如果 CARLA 服务端处于同步模式则进行一次告警
-        if self.is_synchronous_mode():
+        if self.is_synchronous_mode:
             self.logger.warning('CARLA is in synchronous mode, '
                                 'and the passive executor is activated in current client. '
                                 'Make sure there is another CARLA client running the tick.')

@@ -32,6 +32,12 @@ class Executor(ABC):
     def logger(self) -> Logger:
         """当前执行器的日志记录器."""
         return self.context.logger
+    
+    @property
+    def is_synchronous_mode(self) -> bool:
+        """当前 CARLA 服务端是否处于同步模式."""
+        settings: carla.WorldSettings = self.context.client.get_world().get_settings()
+        return settings.synchronous_mode
 
     @abstractmethod
     def tick(self) -> None:
@@ -76,8 +82,3 @@ class Executor(ABC):
             show_progress (bool, optional): 是否打印等待进度日志. 默认为 False.
         """
         raise NotImplementedError
-
-    def is_synchronous_mode(self) -> bool:
-        """当前 CARLA 服务端是否处于同步模式."""
-        settings: carla.WorldSettings = self.context.client.get_world().get_settings()
-        return settings.synchronous_mode

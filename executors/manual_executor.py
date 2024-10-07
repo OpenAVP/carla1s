@@ -40,7 +40,7 @@ class ManualExecutor(Executor):
         self.logger.info('Manual Executor begin.')
 
         # 如果 CARLA 服务端已经处于同步模式, 则引发报错并阻止进一步动作
-        if self.is_synchronous_mode():
+        if self.is_synchronous_mode:
             msg = ('CARLA is in synchronous mode, and the manual executor is activated in current context. '
                    'Please deactivate the synchronous mode first.')
             self.logger.critical(msg)
