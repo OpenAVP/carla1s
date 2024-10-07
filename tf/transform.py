@@ -1,3 +1,4 @@
+import carla
 import numpy as np
 from typing import Optional
 
@@ -120,3 +121,22 @@ class Transform:
         # TODO: AI GENERATED CODE, VERIFY IT!
         return np.rad2deg(np.arctan2(self.matrix[2, 1], self.matrix[2, 2])).item()
 
+    @classmethod
+    def from_carla_transform_obj(cls, transform: carla.Transform) -> 'Transform':
+        """
+        :param transform: CARLA 的变换对象
+        :return: 变换对象
+        """
+        return cls(x=transform.location.x,
+                   y=transform.location.y,
+                   z=transform.location.z,
+                   yaw=transform.rotation.yaw,
+                   pitch=transform.rotation.pitch,
+                   roll=transform.rotation.roll)
+    
+    def as_carla_transform_obj(self) -> carla.Transform:
+        """
+        :return: CARLA 的变换对象
+        """
+        return carla.Transform(location=carla.Location(x=self.x, y=self.y, z=self.z),
+                               rotation=carla.Rotation(yaw=self.yaw, pitch=self.pitch, roll=self.roll))
