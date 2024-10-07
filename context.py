@@ -1,10 +1,9 @@
 import carla
 import logging
 from typing import Optional, List
-from rich.logging import RichHandler
 
 from .errors import ContextError
-from .utils import ProjectFormatter, get_logger
+from .utils import get_logger
 from .actors import ActorFactory, Actor
 
 
