@@ -1,6 +1,6 @@
 import carla
 import logging
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from .errors import ContextError
 from .utils import get_logger
@@ -151,3 +151,25 @@ class Context:
             return False
         finally:
             self.client.set_timeout(self._timeout_sec)
+
+    def reload_world(self, map_name: Union[str, AvailableMaps, None] = None) -> 'Context':
+        """重新加载 CARLA 世界.
+
+        Args:
+            map_name (Union[str, AvailableMaps, None], optional): 需要加载的地图名称. 默认为 None. 
+            如果为 None, 则执行重载而不变更地图.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+        """
+        # 获取地图名
+        if isinstance(map_name, AvailableMaps):
+            map_name = map_name.value
+        
+        # 重新加载世界, settings 与 Executor 有关，不重置
+        if map_name is not None:
+            self.client.load_world(map_name, reset_settings=False)
+        else:
+            self.client.reload_world(reset_settings=False)
+
+        return self
