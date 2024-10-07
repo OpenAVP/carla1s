@@ -1,6 +1,6 @@
 import carla
 import time
-from threading import Thread
+from threading import Thread, Event
 
 from ..context import Context
 from ..errors import ExecutorError
@@ -189,6 +189,35 @@ class ManualExecutor(Executor):
         self.context.world.apply_settings(setting)
         self.context.world.tick()
         self.logger.info(f'Set synchronous mode to {option}.')
+        
+    def join(self, *events: Event, show_progress: bool = False):
+        """等待所有事件完成.
+
+        Args:
+            show_progress (bool, optional): 是否显示进度条. 默认为 False.
+        """
+        # 去重
+        events = set(events)
+        
+        # 显示进度条
+        self.logger.info(f'Waiting for {len(events)} events to complete.')
+        progress = ProgressLogger(
+            logger=self.logger.info if show_progress else self.logger.debug,
+            header='Waiting for events',
+            unit='events',
+            total=len(events),
+        ).start()
+        
+        completed_events = set()
+        while len(completed_events) < len(events):
+            for i, event in enumerate(events):
+                if i not in completed_events and event.is_set():
+                    completed_events.add(i)
+            progress.update(len(completed_events))
+        else:
+            progress.stop()
+            for event in events:
+                event.clear()
 
     def _set_min_tick_wait_seconds(self, value: float):
         """设置最小等待时间。
