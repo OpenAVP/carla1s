@@ -38,6 +38,9 @@ class Actor:
         self._setup = dict()
         # PUBLIC
         self.logger = get_logger(f'carla1s.actors.{self.name}')
+        
+        # 打印实例化日志
+        self.logger.info(f'Actor {self.id} initialized with blueprint {self._blueprint_name}')
 
     @property
     def id(self) -> str:
@@ -102,9 +105,11 @@ class Actor:
     
     @name.setter
     def name(self, name: str) -> None:
-        self._in_name = name
+        old_name = self.name
+        self._name = name
         # 名称变更后，重新获取 logger
         self.logger = logging.getLogger(f'carla1s.actors.{self.name}')
+        self.logger.info(f'Actor name changed from {old_name} to {self.name}')
 
     @property
     def attributes(self) -> Dict[str, any]:
@@ -123,7 +128,7 @@ class Actor:
         """ Actor 的父 Actor.
 
         Returns:
-            Optional[&#39;Actor&#39;]: 如果 Actor 存在父 Actor, 则返回父 Actor, 否则返回 None
+            Optional['Actor']: 如果 Actor 存在父 Actor, 则返回父 Actor, 否则返回 None
         """
         return self._parent
 
@@ -170,6 +175,7 @@ class Actor:
         
         # Actor 生成成功后, 重新获取 logger 以更新名称
         self.logger = logging.getLogger(f'carla1s.actors.{self.name}')
+        self.logger.info(f'Actor {self.id} spawned.')
             
         # 应用缓存的设置
         for setup, option in self._setup.items():
@@ -181,6 +187,7 @@ class Actor:
         if self._entity:
             self._entity.destroy()
             self._entity = None
+            self.logger.info(f'Actor {self.id} destroyed.')
         else:
             self.logger.warning(f'Trying to destroy non-spawned actor.')
     
