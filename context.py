@@ -152,13 +152,13 @@ class Context:
         finally:
             self.client.set_timeout(self._timeout_sec)
 
-    def reload_world(self, map_name: Union[str, AvailableMaps, None] = None) -> 'Context':
+    def reload_world(self, map_name: Union[str, AvailableMaps, None] = None, reset_actor_list: bool = True) -> 'Context':
         """重新加载 CARLA 世界.
 
         Args:
             map_name (Union[str, AvailableMaps, None], optional): 需要加载的地图名称. 默认为 None. 
             如果为 None, 则执行重载而不变更地图.
-
+            reset_actor_list (bool, optional): 是否重置 Actor 列表. 默认为 True.
         Returns:
             Context: 当前 Context 实例, 用于链式调用.
         """
@@ -171,5 +171,9 @@ class Context:
             self.client.load_world(map_name, reset_settings=False)
         else:
             self.client.reload_world(reset_settings=False)
+            
+        # 重置 Actor 列表
+        if reset_actor_list:
+            self._actors = list()
 
         return self
