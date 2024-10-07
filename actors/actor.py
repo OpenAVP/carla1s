@@ -40,7 +40,7 @@ class Actor:
         self.logger = get_logger(f'carla1s.actors.{self.name}')
         
         # 打印实例化日志
-        self.logger.info(f'Actor {self.id} initialized with blueprint {self._blueprint_name}')
+        self.logger.info(f'Actor {self.id} created with blueprint {self._blueprint_name}')
 
     @property
     def id(self) -> str:
