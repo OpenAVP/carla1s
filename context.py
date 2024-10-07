@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Optional, NamedTuple
 from rich.logging import RichHandler
 
-from .exceptions import ContextError
+from .errors import ContextError
 from .utils import ProjectFormatter
 
 

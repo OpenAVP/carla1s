@@ -3,7 +3,7 @@ import time
 from threading import Thread
 
 from ..context import Context, context_func
-from ..exceptions import ExecutorError
+from ..errors import ExecutorError
 from ..utils import ProgressLogger
 from .executor import Executor
 
