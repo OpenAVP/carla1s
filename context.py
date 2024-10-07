@@ -45,6 +45,7 @@ class Context:
         :param log_level: 日志记录的级别.
         :param logger: 用于记录日志的 Logger 实例, 如果为 None, 则会创建一个新的 RichLogger 实例.
         """
+        # PRIVATE
         self._host = host
         self._port = port
         self._timeout_sec = timeout_sec
@@ -59,7 +60,8 @@ class Context:
         logging.basicConfig(level=log_level)
         logging.getLogger().handlers.clear()
         self.logger = get_logger('carla1s.Context') if logger is None else logger
-
+        
+        # PUBLIC
         self.actor_factory = ActorFactory(self.actors)
     
     def __enter__(self) -> 'Context':
