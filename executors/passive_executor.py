@@ -5,11 +5,9 @@ from ..utils import ProgressLogger
 
 
 class PassiveExecutor(Executor):
-    """
-    从动执行器, 执行器将不会控制 CARLA 仿真进行过程, 只会等待仿真进行.
+    """从动执行器, 执行器将不会控制 CARLA 仿真进行过程, 只会等待仿真进行.
 
     从动执行器适用于：
-
     - CARLA 服务端处于异步模式时
     - CARLA 服务端处于同步模式，但本客户端不控制仿真进行过程时
     """
@@ -29,6 +27,7 @@ class PassiveExecutor(Executor):
         self.logger.info('Passive Executor exit.')
 
     def tick(self):
+        """尝试执行 tick 操作（在被动执行器中无效）."""
         self.logger.warning(f'You are trying to tick the CARLA server in Passive Executor, '
                             f'so nothing will happen.')
 

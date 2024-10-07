@@ -14,18 +14,21 @@ class Transform:
                  pitch: float = 0.0,
                  roll: float = 0.0,
                  matrix: Optional[np.ndarray] = None):
-        """
-        变换的表示, 由位置和旋转组成.
+        """变换的表示, 由位置和旋转组成.
 
         左手坐标系, 与 CARLA 和 UnrealEngine 保持一致.
 
-        :param x: 表示物体在一个三维欧几里得空间中的 X 轴位置, 单位米, 右为正
-        :param y: 表示物体在一个三维欧几里得空间中的 Y 轴位置, 单位米, 后为正
-        :param z: 表示物体在一个三维欧几里得空间中的 Z 轴位置, 单位米, 上为正
-        :param yaw: 表示物体绕 Z 轴旋转的欧拉角, 单位度
-        :param pitch: 表示物体绕 Y 轴旋转的欧拉角, 单位度
-        :param roll: 表示物体绕 X 轴旋转的欧拉角, 单位度
-        :param matrix: 变换矩阵, 4x4 的齐次变换矩阵, 如果提供了该参数, 则忽略其他参数
+        Args:
+            x (float, optional): 表示物体在一个三维欧几里得空间中的 X 轴位置, 单位米, 右为正. 默认为 0.0.
+            y (float, optional): 表示物体在一个三维欧几里得空间中的 Y 轴位置, 单位米, 后为正. 默认为 0.0.
+            z (float, optional): 表示物体在一个三维欧几里得空间中的 Z 轴位置, 单位米, 上为正. 默认为 0.0.
+            yaw (float, optional): 表示物体绕 Z 轴旋转的欧拉角, 单位度. 默认为 0.0.
+            pitch (float, optional): 表示物体绕 Y 轴旋转的欧拉角, 单位度. 默认为 0.0.
+            roll (float, optional): 表示物体绕 X 轴旋转的欧拉角, 单位度. 默认为 0.0.
+            matrix (Optional[np.ndarray], optional): 变换矩阵, 4x4 的齐次变换矩阵, 如果提供了该参数, 则忽略其他参数. 默认为 None.
+
+        Raises:
+            ValueError: 如果提供的矩阵不是 4x4 的
         """
         # 如果提供了变换矩阵, 则直接使用
         if matrix is not None:
@@ -61,71 +64,59 @@ class Transform:
 
     @property
     def matrix(self) -> np.ndarray:
-        """
-        :return: 变换矩阵, 4x4 的齐次变换矩阵
-        """
+        """变换矩阵, 4x4 的齐次变换矩阵"""
         return self._matrix
 
     @matrix.setter
     def matrix(self, value: np.ndarray) -> None:
-        """
-        :param value: 新变换矩阵, 4x4 的齐次变换矩阵
-        """
+        """变换矩阵, 4x4 的齐次变换矩阵"""
         self._matrix = value
 
     @property
     def x(self) -> float:
-        """
-        :return: 物体在一个三维欧几里得空间中的 X 轴位置, 单位米, 右为正, 由变换矩阵计算得到
-        """
+        """物体在一个三维欧几里得空间中的 X 轴位置, 单位米, 右为正, 由变换矩阵计算得到"""
         # TODO: AI GENERATED CODE, VERIFY IT!
         return self.matrix[0, 3].item()
 
     @property
     def y(self) -> float:
-        """
-        :return: 物体在一个三维欧几里得空间中的 Y 轴位置, 单位米, 后为正, 由变换矩阵计算得到
-        """
+        """物体在一个三维欧几里得空间中的 Y 轴位置, 单位米, 后为正, 由变换矩阵计算得到"""
         # TODO: AI GENERATED CODE, VERIFY IT!
         return self.matrix[1, 3].item()
 
     @property
     def z(self) -> float:
-        """
-        :return: 物体在一个三维欧几里得空间中的 Z 轴位置, 单位米, 上为正, 由变换矩阵计算得到
-        """
+        """物体在一个三维欧几里得空间中的 Z 轴位置, 单位米, 上为正, 由变换矩阵计算得到"""
         # TODO: AI GENERATED CODE, VERIFY IT!
         return self.matrix[2, 3].item()
 
     @property
     def yaw(self) -> float:
-        """
-        :return: 物体绕 Z 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
-        """
+        """物体绕 Z 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
         # TODO: AI GENERATED CODE, VERIFY IT!
         return np.rad2deg(np.arctan2(self.matrix[1, 0], self.matrix[0, 0])).item()
 
     @property
     def pitch(self) -> float:
-        """
-        :return: 物体绕 Y 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
-        """
+        """物体绕 Y 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
         # TODO: AI GENERATED CODE, VERIFY IT!
         return np.rad2deg(np.arcsin(-self.matrix[2, 0])).item()
 
     @property
     def roll(self) -> float:
-        """
-        :return: 物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
-        """
+        """物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
         # TODO: AI GENERATED CODE, VERIFY IT!
         return np.rad2deg(np.arctan2(self.matrix[2, 1], self.matrix[2, 2])).item()
 
     @classmethod
     def from_carla_transform_obj(cls, transform: carla.Transform) -> 'Transform':
-        """
-        :param transform: CARLA 的变换对象
-        :return: 变换对象
+        """从 CARLA 的变换对象创建 Transform 实例.
+
+        Args:
+            transform: CARLA 的变换对象
+
+        Returns:
+            Transform: 变换对象
         """
         return cls(x=transform.location.x,
                    y=transform.location.y,
@@ -135,8 +126,10 @@ class Transform:
                    roll=transform.rotation.roll)
     
     def as_carla_transform_obj(self) -> carla.Transform:
-        """
-        :return: CARLA 的变换对象
+        """将当前 Transform 实例转换为 CARLA 的变换对象.
+
+        Returns:
+            carla.Transform: CARLA 的变换对象
         """
         return carla.Transform(location=carla.Location(x=self.x, y=self.y, z=self.z),
                                rotation=carla.Rotation(yaw=self.yaw, pitch=self.pitch, roll=self.roll))

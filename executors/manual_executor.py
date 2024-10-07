@@ -9,8 +9,7 @@ from .executor import Executor
 
 
 class ManualExecutor(Executor):
-    """
-    手动执行器, 执行器将会通过 ``tick()`` 控制 CARLA 仿真进行进行过程.
+    """手动执行器, 执行器将会通过 ``tick()`` 控制 CARLA 仿真进行进行过程.
 
     手动执行器适用于：
 
@@ -22,12 +21,14 @@ class ManualExecutor(Executor):
                  context: Context,
                  fixed_delta_seconds: float = 0.05,
                  min_tick_wait_seconds: float = 0.0):
-        """
-        :param context: CARLA 的上下文实例
-        :param fixed_delta_seconds: 每次执行 ``tick()`` 时的仿真器的固定步长, 单位为秒.
-        :param min_tick_wait_seconds: 每次执行 ``tick()`` 时的最小等待时间, 单位为秒.
-            设置为 ``0.0`` 时取与 ``fixed_delta_seconds`` 相同的值.
-            设置为负值时将不进行任何等待 (可能会造成 CARLA 崩溃）.
+        """初始化 ManualExecutor 实例。
+
+        Args:
+            context (Context): CARLA 的上下文实例。
+            fixed_delta_seconds (float, optional): 每次执行 tick() 时的仿真器的固定步长，单位为秒。默认值为 0.05。
+            min_tick_wait_seconds (float, optional): 每次执行 tick() 时的最小等待时间，单位为秒。默认值为 0.0。
+                设置为 0.0 时取与 fixed_delta_seconds 相同的值。
+                设置为负值时将不进行任何等待（可能会造成 CARLA 崩溃）。
         """
         super().__init__(context)
         self._fixed_delta_seconds = fixed_delta_seconds
@@ -57,9 +58,7 @@ class ManualExecutor(Executor):
 
     @property
     def fixed_delta_seconds(self) -> float:
-        """
-        :return: 每次执行 ``tick()`` 时的 CARLA 服务端执行的固定步长, 单位为秒.
-        """
+        """每次执行 ``tick()`` 时的 CARLA 服务端执行的固定步长, 单位为秒."""
         return self._fixed_delta_seconds
 
     @fixed_delta_seconds.setter
@@ -71,9 +70,7 @@ class ManualExecutor(Executor):
 
     @property
     def min_tick_wait_seconds(self) -> float:
-        """
-        :return: 每次执行 ``tick()`` 时的最小等待时间, 单位为秒.
-        """
+        """每次执行 ``tick()`` 时的最小等待时间, 单位为秒."""
         return self._min_tick_wait_seconds
 
     @min_tick_wait_seconds.setter
@@ -195,11 +192,13 @@ class ManualExecutor(Executor):
         self.logger.info(f'Set synchronous mode to {option}.')
 
     def _set_min_tick_wait_seconds(self, value: float):
-        """
-        设置最小等待时间.
-        :param value: 如果输入值小于 0.0, 则设置为 0.0;
-            如果输入值等于 0.0, 则设置为 ``fixed_delta_seconds`` 的值;
-            否则设置为输入值.
+        """设置最小等待时间。
+
+        Args:
+            value (float): 最小等待时间值。
+                如果小于 0.0, 则设置为 0.0;
+                如果等于 0.0, 则设置为 `fixed_delta_seconds` 的值；
+                否则设置为输入值。
         """
         if value < 0.0:
             self._min_tick_wait_seconds = 0.0

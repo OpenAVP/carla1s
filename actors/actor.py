@@ -40,19 +40,11 @@ class Actor:
         self.logger = get_logger(f'carla1s.actors.{self.name}')
         
         # 打印实例化日志
-        self.logger.info(f'Actor {self.id} created with blueprint {self._blueprint_name}')
+        self.logger.info(f'Actor {self.id} create with blueprint {self._blueprint_name}')
 
     @property
     def id(self) -> str:
-        """ 标识符, 由当前实例初始化时生成的 `uuid4` 和 CARLA Server 授予 `entity` 的 id 共同组成.
-        
-        格式为: `$UUID($CARLA_ID)`
-        
-        当实例所代表的 Actor 实体未在 CARLA 中创建或者已经被销毁时, CARLA_ID 为 -1.
-
-        Returns:
-            str: 返回 Actor 的 id
-        """
+        """ 标识符, 由当前实例初始化时生成的 `uuid4` 和 CARLA Server 授予 `entity` 的 id 共同组成."""
         carla_id = -1
         if self._entity:
             carla_id = self._entity.id
@@ -60,44 +52,26 @@ class Actor:
 
     @property
     def entity(self) -> carla.Actor:
-        """ Actor 在 CARLA Server 中的实体, 只读.
-
-        Returns:
-            carla.Actor: Actor 对象
-        """
+        """ Actor 在 CARLA Server 中的实体, 只读."""
         return self._entity
 
     @property
     def is_alive(self) -> bool:
-        """ 实体是否存活.
-
-        Returns:
-            bool: 如果 Actor 实体在 CARLA 中存在且未被销毁, 则返回 True, 否则返回 False
-        """
+        """ 实体是否存活."""
         if self._entity is None:
             return False
         return self._entity.is_alive
 
     @property
     def blueprint_name(self) -> str:
-        """ Actor 的蓝图名称.
-
-        Returns:
-            str: Actor 的蓝图名称, 与 [CARLA DOCS] 中的定义一致
-        """
+        """ Actor 的蓝图名称."""
         return self._blueprint_name
     
     @property
     def name(self) -> str:
-        """ Actor 的昵称.
-
-        Returns:
-            str: 如果指定了名称, 则返回指定名称, 否则返回默认名称
-        """
-        # 如果指定了名称, 则直接返回
+        """ Actor 的昵称."""
         if self._name:
             return self._name
-        # 否则, 返回默认名称
         defualt_name = self._blueprint_name.split('.')[0]
         defualt_name += f'-{self._blueprint_name.split(".")[-1]}'
         defualt_name += f' | {self.id}'
@@ -107,17 +81,12 @@ class Actor:
     def name(self, name: str) -> None:
         old_name = self.name
         self._name = name
-        # 名称变更后，重新获取 logger
         self.logger = logging.getLogger(f'carla1s.actors.{self.name}')
         self.logger.info(f'Actor name changed from {old_name} to {self.name}')
 
     @property
     def attributes(self) -> Dict[str, any]:
-        """ Actor 属性的拷贝.
-
-        Returns:
-            Dict[str, any]: 如果实体存在则返回实体的属性, 否则返回输入值
-        """
+        """ Actor 属性的拷贝."""
         if self._entity:
             return self._entity.attributes
         else:
@@ -125,11 +94,7 @@ class Actor:
 
     @property
     def parent(self) -> Optional['Actor']:
-        """ Actor 的父 Actor.
-
-        Returns:
-            Optional['Actor']: 如果 Actor 存在父 Actor, 则返回父 Actor, 否则返回 None
-        """
+        """ Actor 的父 Actor."""
         return self._parent
 
     def spawn(self, world: carla.World) -> None:
