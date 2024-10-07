@@ -81,7 +81,7 @@ class Actor:
     def name(self, name: str) -> None:
         old_name = self.name
         self._name = name
-        self.logger = logging.getLogger(f'carla1s.actors.{self.name}')
+        self.logger = get_logger(f'carla1s.actors.{self.name}')
         self.logger.info(f'Actor name changed from {old_name} to {self.name}')
 
     @property
@@ -139,7 +139,7 @@ class Actor:
             raise CarlaError(f"Failed to spawn actor: {e}") from e
         
         # Actor 生成成功后, 重新获取 logger 以更新名称
-        self.logger = logging.getLogger(f'carla1s.actors.{self.name}')
+        self.logger = get_logger(f'carla1s.actors.{self.name}')
         self.logger.info(f'Actor {self.id} spawned.')
             
         # 应用缓存的设置
