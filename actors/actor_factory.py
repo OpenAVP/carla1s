@@ -1,4 +1,6 @@
-from typing import TypeVar, Type, Optional
+import carla
+from enum import Enum
+from typing import TypeVar, Type, Optional, Union
 
 from .actor import Actor
 from ..tf import Transform
@@ -9,17 +11,13 @@ T = TypeVar('T', bound=Actor)
 class ActorFactory:
     
     class Builder:
-        def __init__(self, actor_class: Type[T]):
+        def __init__(self, blueprint_name: str, actor_class: Type[T]):
             self._actor_class = actor_class
-            self._blueprint_name = ''
+            self._blueprint_name = blueprint_name
             self._name = ''
             self._transform = Transform()
             self._parent = None
             self._attributes = {}
-            
-        def from_blueprint(self, blueprint_name: str) -> 'ActorFactory.Builder':
-            self._blueprint_name = blueprint_name
-            return self
         
         def with_name(self, name: str) -> 'ActorFactory.Builder':
             self._name = name
@@ -82,5 +80,16 @@ class ActorFactory:
                 attributes=self._attributes
             )
         
-    def create(self, actor_class: Type[T]) -> 'Builder':
-        return self.Builder(actor_class)
+    def create(self, 
+               actor_class: Type[T], 
+               *,
+               from_blueprint: Union[str, carla.ActorBlueprint, Enum] = None) -> 'Builder':
+        # 获取 blueprint_name
+        if isinstance(from_blueprint, Enum):
+            blueprint_name = from_blueprint.value
+        elif isinstance(from_blueprint, carla.ActorBlueprint):
+            blueprint_name = from_blueprint.id
+        else:
+            blueprint_name = from_blueprint
+        
+        return self.Builder(blueprint_name, actor_class)

@@ -6,6 +6,7 @@ from rich.logging import RichHandler
 
 from .errors import ContextError
 from .utils import ProjectFormatter
+from .actors import ActorFactory
 
 
 def context_func(method):
@@ -55,6 +56,7 @@ class Context:
         self._actors = list()
 
         self.logger = self._create_logger() if logger is None else logger
+        self.actor_factory = ActorFactory()
     
     def __enter__(self) -> 'Context':
         # 只有当程序使用 with 语句时, 才会标记 _initialized 为 True
