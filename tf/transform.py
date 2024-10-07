@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Optional
 
 
 class Transform:
@@ -11,7 +12,7 @@ class Transform:
                  yaw: float = 0.0,
                  pitch: float = 0.0,
                  roll: float = 0.0,
-                 matrix: np.ndarray = None):
+                 matrix: Optional[np.ndarray] = None):
         """
         变换的表示, 由位置和旋转组成.
 
