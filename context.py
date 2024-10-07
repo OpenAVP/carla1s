@@ -5,6 +5,7 @@ from typing import Optional, List
 from .errors import ContextError
 from .utils import get_logger
 from .actors import ActorFactory, Actor
+from .registry import AvailableActors, AvailableMaps, AvailableVehicles, AvailableSensors
 
 
 class Context:
@@ -43,6 +44,10 @@ class Context:
         
         # PUBLIC
         self.actor_factory = ActorFactory(self.actors)
+        self.available_actors = AvailableActors
+        self.available_maps = AvailableMaps
+        self.available_vehicles = AvailableVehicles
+        self.available_sensors = AvailableSensors
     
     def __enter__(self) -> 'Context':
         # 尝试连接到 CARLA 服务端
