@@ -1,6 +1,5 @@
 import carla
 import logging
-from functools import wraps
 from typing import Optional, NamedTuple, List
 from rich.logging import RichHandler
 
@@ -8,22 +7,6 @@ from .errors import ContextError
 from .utils import ProjectFormatter, get_logger
 from .actors import ActorFactory, Actor
 
-
-def context_func(method):
-    """
-    将一个方法包装为上下文方法, 该方法只有在上下文初始化且对 CARLA 连接成功时才会执行.
-    """
-    @wraps(method)
-    def wrapper(self, *args, **kwargs):
-        if not self._initialized:
-            self.logger.warning(f'Method {method.__name__}() skipped because the context is not initialized, '
-                                f'use with statement to initialize the context.')
-            return None
-        if not self.test_connection():
-            self.logger.warning(f'Method {method.__name__}() skipped because the CARLA connection is not established.')
-            return None
-        return method(self, *args, **kwargs)
-    return wrapper
 
 class Context:
     """
@@ -51,8 +34,6 @@ class Context:
         self._timeout_sec = timeout_sec
         self._log_level = log_level
 
-        self._initialized = False
-
         self._client: Optional[carla.Client] = None
         self._actors: List[Actor] = list()
 
@@ -65,9 +46,6 @@ class Context:
         self.actor_factory = ActorFactory(self.actors)
     
     def __enter__(self) -> 'Context':
-        # 只有当程序使用 with 语句时, 才会标记 _initialized 为 True
-        self._initialized = True
-
         # 尝试连接到 CARLA 服务端
         try:
             self.connect()
@@ -103,7 +81,6 @@ class Context:
         return self._client
 
     @property
-    @context_func
     def world(self) -> carla.World:
         """
         :return: 当前上下文中的 CARLA 世界实例. 该实例可能会因为地图切换而发生变化.
@@ -169,6 +146,5 @@ class Context:
         finally:
             self.client.set_timeout(self._timeout_sec)
 
-    @context_func
     def test(self):
         self.logger.info('OK')

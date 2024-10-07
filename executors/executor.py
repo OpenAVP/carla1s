@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import carla
 
-from ..context import Context, context_func
+from ..context import Context
 
 
 class Executor(ABC):
@@ -34,13 +34,11 @@ class Executor(ABC):
         return self.context.logger
 
     @abstractmethod
-    @context_func
     def tick(self) -> None:
         """要求 CARLA 仿真器进行一次 ``tick()``."""
         raise NotImplementedError
 
     @abstractmethod
-    @context_func
     def spin(self, show_progress: bool = False) -> None:
         """阻塞当前线程, 直到接收到 KeyboardInterrupt 信号.
 
@@ -50,7 +48,6 @@ class Executor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    @context_func
     def wait_real_seconds(self, seconds: float, show_progress: bool = False) -> None:
         """等待一定真实世界的秒数
 
@@ -61,7 +58,6 @@ class Executor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    @context_func
     def wait_sim_seconds(self, seconds: float, show_progress: bool = False) -> None:
         """等待一定仿真世界的秒数
 
@@ -72,7 +68,6 @@ class Executor(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    @context_func
     def wait_ticks(self, ticks: int, show_progress: bool = False):
         """等待一定的 Tick 次数.
 
@@ -82,7 +77,6 @@ class Executor(ABC):
         """
         raise NotImplementedError
 
-    @context_func
     def is_synchronous_mode(self) -> bool:
         """当前 CARLA 服务端是否处于同步模式."""
         settings: carla.WorldSettings = self.context.client.get_world().get_settings()

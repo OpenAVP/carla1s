@@ -2,7 +2,7 @@ import carla
 import time
 from threading import Thread
 
-from ..context import Context, context_func
+from ..context import Context
 from ..errors import ExecutorError
 from ..utils import ProgressLogger
 from .executor import Executor
@@ -179,7 +179,6 @@ class ManualExecutor(Executor):
         else:
             progress.stop()
 
-    @context_func
     def set_synchronous_mode(self, option: bool):
         # 调整同步模式设定
         setting: carla.WorldSettings = self.context.world.get_settings()
