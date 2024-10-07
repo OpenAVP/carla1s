@@ -64,7 +64,14 @@ class CoordConverter:
             if not isinstance(transform, Transform) or isinstance(transform, Point):
                 raise ValueError("The transform must be an instance of Transform.")
 
-            # TODO: 实现逻辑并更新注释
+            new_data: List[Union[Point, Transform]] = list()
+
+            # 遍历所有变换，并进行变换
+            for data in self.data:
+                temp_matrix = transform.matrix.dot(data.matrix)
+                temp_transform = Transform(matrix=temp_matrix)
+                new_data.append(temp_transform)
+            self.data = new_data
             return self
 
         def get_list(self) -> List[Union[Point, Transform]]:
