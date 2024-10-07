@@ -155,9 +155,10 @@ class Actor:
         """ 销毁 Actor 实体.
         """
         if self._entity:
+            cache_id = self.id
             self._entity.destroy()
             self._entity = None
-            self.logger.info(f'Actor {self.id} destroyed.')
+            self.logger.info(f'Actor {cache_id} destroyed.')
         else:
             self.logger.warning(f'Trying to destroy non-spawned actor.')
     
