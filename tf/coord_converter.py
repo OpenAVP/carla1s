@@ -46,13 +46,13 @@ class CoordConverter:
             # TODO: 实现逻辑并更新注释
             return self
 
-        def as_list(self) -> List[Union[Point, Transform]]:
+        def get_list(self) -> List[Union[Point, Transform]]:
             """
             :return: 以列表方式转换后的变换组
             """
             return self.data
 
-        def as_single(self) -> Union[Point, Transform]:
+        def get_single(self) -> Union[Point, Transform]:
             """
             :return: 以单个元素方式转换后的变换组
             """
