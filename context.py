@@ -32,7 +32,6 @@ class Context:
         self._host = host
         self._port = port
         self._timeout_sec = timeout_sec
-        self._log_level = log_level
 
         self._client: Optional[carla.Client] = None
         self._actors: List[Actor] = list()
@@ -145,6 +144,3 @@ class Context:
             return False
         finally:
             self.client.set_timeout(self._timeout_sec)
-
-    def test(self):
-        self.logger.info('OK')
