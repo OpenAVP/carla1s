@@ -4,6 +4,7 @@ from typing import TypeVar, Type, Optional, Union, List
 
 from .actor import Actor
 from ..tf import Transform
+from ..utils import get_logger
 
 
 T = TypeVar('T', bound=Actor)
@@ -12,6 +13,7 @@ class ActorFactory:
     
     def __init__(self, ref_actor_list: List[Actor]) -> None:
         self._ref_actor_list = ref_actor_list
+        self.logger = get_logger('carla1s.actors.actor_factory')
     
     class Builder:
         def __init__(self, 
@@ -100,5 +102,8 @@ class ActorFactory:
             blueprint_name = from_blueprint.id
         else:
             blueprint_name = from_blueprint
+        
+        # 打印创建日志
+        self.logger.info(f'Creating actor {actor_class.__name__} with blueprint {blueprint_name}')
         
         return self.Builder(blueprint_name, actor_class, self._ref_actor_list)
