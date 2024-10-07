@@ -1,21 +1,22 @@
 import carla
 import logging
 import numpy as np
-from typing import Optional
+from typing import Optional, Dict
 from threading import Event
 
 from .actor import Actor
+from ..tf import Transform
 
 
 class Sensor(Actor):
     
     def __init__(self, 
-                 blueprint: carla.ActorBlueprint, 
-                 name: str, 
-                 parent: Actor = None, 
-                 attributes: dict = None, 
-                 logger: logging.Logger = None):
-        super().__init__(blueprint, name, parent, attributes, logger)
+                 blueprint_name: str,
+                 name: str = '',
+                 transform: Transform = Transform(),
+                 parent: Optional['Actor'] = None,
+                 attributes: Dict[str, any] = {}) -> None:
+        super().__init__(blueprint_name, name, transform, parent, attributes)
         self.on_data_ready = Event()
         self.data: Optional[np.ndarray] = None
     

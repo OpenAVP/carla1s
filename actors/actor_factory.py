@@ -3,6 +3,7 @@ from enum import Enum
 from typing import TypeVar, Type, Optional, Union, List, Tuple, Dict
 
 from .actor import Actor
+from .rgb_camera import RgbCamera
 from .actor_template import ActorTemplate
 from ..tf import Transform
 from ..utils import get_logger
@@ -108,7 +109,13 @@ class ActorFactory:
         # 获取 blueprint_name 和 attributes
         blueprint_name = None
         attributes = {}
-
+        
+        # 对精确类进行豁免, 要求双空
+        if from_blueprint is None and from_template is None:
+            if actor_class is RgbCamera:
+                blueprint_name = 'sensor.camera.rgb'
+        
+        # 确定 blueprint_name 和 attributes
         if from_blueprint is not None:
             if isinstance(from_blueprint, Enum):
                 blueprint_name = from_blueprint.value
