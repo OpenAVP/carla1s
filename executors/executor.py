@@ -13,7 +13,6 @@ class Executor(ABC):
     def __init__(self, ctx: Context):
         self._context = ctx
         self.test_connection = ctx.test_connection
-        self._initialized = ctx.initialized
 
     @abstractmethod
     def __enter__(self):
