@@ -3,6 +3,7 @@ __pycache__/
 
 # 忽略 Python 虚拟环境
 .venv/
+venv/
 
 # 忽略 IDE 设置
 .vscode/
