@@ -5,7 +5,7 @@ from typing import Optional, List, Union
 from .errors import ContextError
 from .utils import get_logger
 from .actors import ActorFactory, Actor
-from .registry import AvailableActors, AvailableMaps, AvailableVehicles, AvailableSensors
+from .registry import AvailableActors, AvailableMaps, AvailableVehicles, AvailableSensors, ActorTemplates
 from .tf import Transform
 
 
@@ -49,7 +49,7 @@ class Context:
         self.available_maps = AvailableMaps
         self.available_vehicles = AvailableVehicles
         self.available_sensors = AvailableSensors
-    
+        self.actor_templates = ActorTemplates
     def __enter__(self) -> 'Context':
         # 尝试连接到 CARLA 服务端
         try:

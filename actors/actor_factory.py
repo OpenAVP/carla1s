@@ -1,8 +1,9 @@
 import carla
 from enum import Enum
-from typing import TypeVar, Type, Optional, Union, List, Tuple
+from typing import TypeVar, Type, Optional, Union, List, Tuple, Dict
 
 from .actor import Actor
+from .actor_template import ActorTemplate
 from ..tf import Transform
 from ..utils import get_logger
 
@@ -17,15 +18,16 @@ class ActorFactory:
     
     class Builder:
         def __init__(self, 
-                     blueprint_name: str, 
+                     blueprint_name: str,
                      actor_class: Type[T],
-                     ref_actor_list: List[Actor]):
+                     ref_actor_list: List[Actor],
+                     attributes: Dict[str, any] = dict()):
             self._actor_class = actor_class
             self._blueprint_name = blueprint_name
             self._name = ''
             self._transform = Transform()
             self._parent = None
-            self._attributes = {}
+            self._attributes = attributes
             self._ref_actor_list = ref_actor_list
         
         def with_name(self, name: str) -> 'ActorFactory.Builder':
@@ -97,16 +99,35 @@ class ActorFactory:
     def create(self, 
                actor_class: Type[T], 
                *,
-               from_blueprint: Union[str, carla.ActorBlueprint, Enum] = None) -> 'Builder':
-        # 获取 blueprint_name
-        if isinstance(from_blueprint, Enum):
-            blueprint_name = from_blueprint.value
-        elif isinstance(from_blueprint, carla.ActorBlueprint):
-            blueprint_name = from_blueprint.id
-        else:
-            blueprint_name = from_blueprint
+               from_blueprint: Union[str, carla.ActorBlueprint, Enum] = None,
+               from_template: Union[ActorTemplate, Enum] = None) -> 'Builder':
+        # 阻止同时使用 from_blueprint 和 from_template
+        if from_blueprint is not None and from_template is not None:
+            raise ValueError('Cannot use both from_blueprint and from_template.')
         
+        # 获取 blueprint_name 和 attributes
+        blueprint_name = None
+        attributes = {}
+
+        if from_blueprint is not None:
+            if isinstance(from_blueprint, Enum):
+                blueprint_name = from_blueprint.value
+            elif isinstance(from_blueprint, carla.ActorBlueprint):
+                blueprint_name = from_blueprint.id
+                attributes = from_blueprint.attributes
+            elif isinstance(from_blueprint, str):
+                blueprint_name = from_blueprint
+        elif from_template is not None:
+            if isinstance(from_template, ActorTemplate):
+                blueprint_name = from_template.blueprint_name
+                attributes = from_template.attributes
+            elif isinstance(from_template, Enum):
+                blueprint_name = from_template.value.blueprint_name
+                attributes = from_template.value.attributes
+
+        if blueprint_name is None:
+            raise ValueError("Invalid blueprint or template provided")
         # 打印创建日志
         self.logger.info(f'Creating actor {actor_class.__name__} with blueprint {blueprint_name}')
         
-        return self.Builder(blueprint_name, actor_class, self._ref_actor_list)
+        return self.Builder(blueprint_name, actor_class, self._ref_actor_list, attributes)
