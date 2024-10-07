@@ -24,7 +24,7 @@ class Actor:
             blueprint_name (str): 用于生成 Actor 的蓝图名称.
             name (str, optional): 昵称.
             transfrom (Transform, optional): Actor 生成所用坐标的变换.
-            parent (Optional[&#39;Actor&#39;], optional): 当前 Actor 的父 Actor. 
+            parent (Optional['Actor'], optional): 当前 Actor 的父 Actor. 
             attributes (Dict[str, any], optional): 当前 Actor 的属性.
         """
         # PRIVAET
