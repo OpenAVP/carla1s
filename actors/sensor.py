@@ -8,6 +8,15 @@ from .actor import Actor
 from ..tf import Transform
 
 
+class SensorData:
+    """ 传感器数据类, 用于存储传感器数据."""
+    
+    def __init__(self, data: np.ndarray, frame: int, timestamp: float, transform: Transform) -> None:
+        self.data = data
+        self.frame = frame
+        self.timestamp = timestamp
+        self.transform = transform
+
 class Sensor(Actor):
     
     def __init__(self, 
@@ -18,7 +27,7 @@ class Sensor(Actor):
                  attributes: Dict[str, any] = {}) -> None:
         super().__init__(blueprint_name, name, transform, parent, attributes)
         self.on_data_ready = Event()
-        self.data: Optional[np.ndarray] = None
+        self.data: Optional[SensorData] = None
     
     @property
     def entity(self) -> carla.Sensor:
@@ -49,4 +58,3 @@ class Sensor(Actor):
     
     def _callback(self, data: carla.SensorData):
         pass
-        
