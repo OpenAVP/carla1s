@@ -6,6 +6,7 @@ from .actor import Actor
 from .rgb_camera import RgbCamera
 from .lidar import Lidar
 from .semantic_lidar import SemanticLidar
+from .radar import Radar
 from .actor_template import ActorTemplate
 from ..tf import Transform
 from ..utils import get_logger
@@ -120,6 +121,8 @@ class ActorFactory:
                 blueprint_name = 'sensor.lidar.ray_cast'
             elif actor_class is SemanticLidar:
                 blueprint_name = 'sensor.lidar.ray_cast_semantic'
+            elif actor_class is Radar:
+                blueprint_name = 'sensor.other.radar'
         
         # 确定 blueprint_name 和 attributes
         if from_blueprint is not None:
