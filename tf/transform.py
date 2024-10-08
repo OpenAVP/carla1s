@@ -77,44 +77,32 @@ class Transform:
 
     @property
     def x(self) -> float:
-        """
-        :return: 表示物体在其所在坐标系下的 X 轴上的位置, 单位米
-        """
+        """表示物体在其所在坐标系下的 X 轴上的位置, 单位米"""
         return self.matrix[0, 3].item()
 
     @property
     def y(self) -> float:
-        """
-        :return: 表示物体在其所在坐标系下的 X 轴上的位置, 单位米
-        """
+        """表示物体在其所在坐标系下的 X 轴上的位置, 单位米"""
         return self.matrix[1, 3].item()
 
     @property
     def z(self) -> float:
-        """
-        :return: 表示物体在其所在坐标系下的 X 轴上的位置, 单位米
-        """
+        """表示物体在其所在坐标系下的 X 轴上的位置, 单位米"""
         return self.matrix[2, 3].item()
 
     @property
     def yaw(self) -> float:
-        """
-        :return: 物体绕 Z 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
-        """
+        """物体绕 Z 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
         return np.rad2deg(np.arctan2(self.matrix[1, 0], self.matrix[0, 0])).item()
 
     @property
     def pitch(self) -> float:
-        """
-        :return: 物体绕 Y 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
-        """
+        """物体绕 Y 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
         return np.rad2deg(np.arcsin(-self.matrix[2, 0])).item()
 
     @property
     def roll(self) -> float:
-        """
-        :return: 物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
-        """
+        """物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
         return np.rad2deg(np.arctan2(self.matrix[2, 1], self.matrix[2, 2])).item()
 
     @classmethod
