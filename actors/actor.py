@@ -40,7 +40,7 @@ class Actor:
         self.logger = get_logger(f'carla1s.actors.{self.name}')
         
         # 打印实例化日志
-        self.logger.info(f'Actor {self.id} create with blueprint {self._blueprint_name}')
+        self.logger.info(f'Actor create with blueprint {self._blueprint_name}')
 
     @property
     def id(self) -> str:
@@ -70,12 +70,9 @@ class Actor:
     @property
     def name(self) -> str:
         """ Actor 的昵称."""
-        if self._name:
-            return self._name
-        defualt_name = self._blueprint_name.split('.')[0]
-        defualt_name += f'-{self._blueprint_name.split(".")[-1]}'
-        defualt_name += f' | {self.id}'
-        return defualt_name
+        header = self._name if self._name else self._blueprint_name
+        name = f'{header} {self.id}'
+        return name
     
     @name.setter
     def name(self, name: str) -> None:
@@ -111,7 +108,7 @@ class Actor:
             if self._entity.is_alive:
                 raise ContextError(f"Actor {self.name} (ID: {self.id}) already exists.")
             else:
-                self.logger.warning(f'Trying to re-spawn a non-alive Actor {self.name} (ID: {self.id}). Proceeding with spawn.')
+                self.logger.warning(f'Trying to re-spawn a non-alive Actor {self.name}. Proceeding with spawn.')
         
         # 构造蓝图
         blueprint = world.get_blueprint_library().find(self._blueprint_name)
@@ -143,7 +140,7 @@ class Actor:
         
         # Actor 生成成功后, 重新获取 logger 以更新名称
         self.logger = get_logger(f'carla1s.actors.{self.name}')
-        self.logger.info(f'Actor {self.id} spawned.')
+        self.logger.info(f'Actor spawned.')
 
         # 应用缓存的设置
         for setup, option in self._setup.items():
@@ -155,12 +152,11 @@ class Actor:
         """ 销毁 Actor 实体.
         """
         if self._entity:
-            cache_id = self.id
             self._entity.destroy()
             self._entity = None
-            self.logger.info(f'Actor {cache_id} destroyed.')
+            self.logger.warning(f'Actor destroyed.')
         else:
-            self.logger.warning(f'Trying to destroy non-spawned actor.')
+            self.logger.error(f'Trying to destroy non-spawned actor.')
     
     def set_attribute(self, key: str, value: any) -> None:
         """ 设置 Actor 属性.
