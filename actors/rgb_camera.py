@@ -13,7 +13,6 @@ class RgbCamera(Sensor):
         )
         img = img[:, :, :3]
         img = img[:, :, ::-1]
-        self.logger.info(f'Received image with shape {img.shape}')
         self.data = img
         self.on_data_ready.set()
     
