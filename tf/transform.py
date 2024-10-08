@@ -43,7 +43,6 @@ class Transform:
         roll = np.deg2rad(roll)
 
         # 计算每个轴的旋转矩阵
-        # TODO: AI GENERATED CODE, VERIFY IT!
         R_yaw = np.array([[np.cos(yaw), -np.sin(yaw), 0],
                           [np.sin(yaw), np.cos(yaw), 0],
                           [0, 0, 1]])
@@ -54,7 +53,7 @@ class Transform:
                            [0, np.cos(roll), -np.sin(roll)],
                            [0, np.sin(roll), np.cos(roll)]])
 
-        # 组合旋转矩阵
+        # 组合旋转矩阵 roll -> pitch -> yaw
         R = R_yaw @ R_pitch @ R_roll
 
         # 构建齐次变换矩阵
@@ -64,43 +63,58 @@ class Transform:
 
     @property
     def matrix(self) -> np.ndarray:
-        """变换矩阵, 4x4 的齐次变换矩阵"""
+        """
+        :return: 变换矩阵, 4x4 的齐次变换矩阵
+        """
         return self._matrix
+
+    @matrix.setter
+    def matrix(self, value: np.ndarray) -> None:
+        """
+        :param value: 新变换矩阵, 4x4 的齐次变换矩阵
+        """
+        self._matrix = value
 
     @property
     def x(self) -> float:
-        """物体在一个三维欧几里得空间中的 X 轴位置, 单位米, 右为正, 由变换矩阵计算得到"""
-        # TODO: AI GENERATED CODE, VERIFY IT!
+        """
+        :return: 表示物体在其所在坐标系下的 X 轴上的位置, 单位米
+        """
         return self.matrix[0, 3].item()
 
     @property
     def y(self) -> float:
-        """物体在一个三维欧几里得空间中的 Y 轴位置, 单位米, 后为正, 由变换矩阵计算得到"""
-        # TODO: AI GENERATED CODE, VERIFY IT!
+        """
+        :return: 表示物体在其所在坐标系下的 X 轴上的位置, 单位米
+        """
         return self.matrix[1, 3].item()
 
     @property
     def z(self) -> float:
-        """物体在一个三维欧几里得空间中的 Z 轴位置, 单位米, 上为正, 由变换矩阵计算得到"""
-        # TODO: AI GENERATED CODE, VERIFY IT!
+        """
+        :return: 表示物体在其所在坐标系下的 X 轴上的位置, 单位米
+        """
         return self.matrix[2, 3].item()
 
     @property
     def yaw(self) -> float:
-        """物体绕 Z 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
-        # TODO: AI GENERATED CODE, VERIFY IT!
+        """
+        :return: 物体绕 Z 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
+        """
         return np.rad2deg(np.arctan2(self.matrix[1, 0], self.matrix[0, 0])).item()
 
     @property
     def pitch(self) -> float:
-        """物体绕 Y 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
-        # TODO: AI GENERATED CODE, VERIFY IT!
+        """
+        :return: 物体绕 Y 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
+        """
         return np.rad2deg(np.arcsin(-self.matrix[2, 0])).item()
 
     @property
     def roll(self) -> float:
-        """物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
-        # TODO: AI GENERATED CODE, VERIFY IT!
+        """
+        :return: 物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到
+        """
         return np.rad2deg(np.arctan2(self.matrix[2, 1], self.matrix[2, 2])).item()
 
     @classmethod
