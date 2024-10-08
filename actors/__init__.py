@@ -4,6 +4,8 @@ from .sensor import Sensor
 from .actor_factory import ActorFactory
 from .actor_template import ActorTemplate
 from .rgb_camera import RgbCamera
+from .lidar import Lidar
+from .semantic_lidar import SemanticLidar
 
 __all__ = [
     'Actor',
@@ -12,4 +14,6 @@ __all__ = [
     'ActorFactory',
     'ActorTemplate',
     'RgbCamera',
+    'Lidar',
+    'SemanticLidar',
 ]

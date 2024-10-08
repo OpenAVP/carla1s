@@ -4,6 +4,8 @@ from typing import TypeVar, Type, Optional, Union, List, Tuple, Dict
 
 from .actor import Actor
 from .rgb_camera import RgbCamera
+from .lidar import Lidar
+from .semantic_lidar import SemanticLidar
 from .actor_template import ActorTemplate
 from ..tf import Transform
 from ..utils import get_logger
@@ -114,6 +116,10 @@ class ActorFactory:
         if from_blueprint is None and from_template is None:
             if actor_class is RgbCamera:
                 blueprint_name = 'sensor.camera.rgb'
+            elif actor_class is Lidar:
+                blueprint_name = 'sensor.lidar.ray_cast'
+            elif actor_class is SemanticLidar:
+                blueprint_name = 'sensor.lidar.ray_cast_semantic'
         
         # 确定 blueprint_name 和 attributes
         if from_blueprint is not None:
