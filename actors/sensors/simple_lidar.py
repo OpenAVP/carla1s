@@ -1,9 +1,9 @@
 import carla
 import numpy as np
-from .sensor import Sensor
+from ..sensor import Sensor
 
 
-class Lidar(Sensor):
+class SimpleLidar(Sensor):
     
     def _callback(self, lidar_data: carla.LidarMeasurement):
         self.on_data_ready.clear()

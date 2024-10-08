@@ -3,10 +3,10 @@ from enum import Enum
 from typing import TypeVar, Type, Optional, Union, List, Tuple, Dict
 
 from .actor import Actor
-from .rgb_camera import RgbCamera
-from .lidar import Lidar
-from .semantic_lidar import SemanticLidar
-from .radar import Radar
+from .sensors.simple_lidar import SimpleLidar
+from .sensors.semantic_lidar import SemanticLidar
+from .sensors.simple_radar import SimpleRadar
+from .sensors.rgb_camera import RgbCamera
 from .actor_template import ActorTemplate
 from ..tf import Transform
 from ..utils import get_logger
@@ -117,11 +117,11 @@ class ActorFactory:
         if from_blueprint is None and from_template is None:
             if actor_class is RgbCamera:
                 blueprint_name = 'sensor.camera.rgb'
-            elif actor_class is Lidar:
+            elif actor_class is SimpleLidar:
                 blueprint_name = 'sensor.lidar.ray_cast'
             elif actor_class is SemanticLidar:
                 blueprint_name = 'sensor.lidar.ray_cast_semantic'
-            elif actor_class is Radar:
+            elif actor_class is SimpleRadar:
                 blueprint_name = 'sensor.other.radar'
         
         # 确定 blueprint_name 和 attributes

@@ -1,6 +1,6 @@
 import carla
 import numpy as np
-from .sensor import Sensor
+from ..sensor import Sensor
 
 
 class RgbCamera(Sensor):
