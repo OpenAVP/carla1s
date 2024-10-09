@@ -16,7 +16,7 @@ class SimpleLidar(Sensor):
         
         # 组装传感器数据
         self.data = SensorData(points, lidar_data.frame, lidar_data.timestamp, Transform.from_carla_transform_obj(lidar_data.transform))
-        self.logger.debug(f'LiDAR data captured, frame: {self.data.frame}, time: {self.data.timestamp}, tf: {self.data.transform}')
+        self.logger.debug(f'LiDAR data captured, frame: {self.data.frame}, time: {self.data.timestamp}')
         
         # 触发事件
         self.on_data_ready.set()

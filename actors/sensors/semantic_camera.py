@@ -21,7 +21,7 @@ class SemanticCamera(Sensor):
         
         # 组装传感器数据
         self.data = SensorData(img, image.frame, image.timestamp, Transform.from_carla_transform_obj(image.transform))
-        self.logger.debug(f'Semantic image captured, frame: {self.data.frame}, time: {self.data.timestamp}, tf: {self.data.transform}')
+        self.logger.debug(f'Semantic image captured, frame: {self.data.frame}, time: {self.data.timestamp}')
         
         # 触发事件
         self.on_data_ready.set()

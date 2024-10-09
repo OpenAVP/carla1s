@@ -23,7 +23,7 @@ class SimpleRadar(Sensor):
         
         # 组装传感器数据
         self.data = SensorData(points, radar_data.frame, radar_data.timestamp, Transform.from_carla_transform_obj(radar_data.transform))
-        self.logger.debug(f'Radar data captured, frame: {self.data.frame}, time: {self.data.timestamp}, tf: {self.data.transform}')
+        self.logger.debug(f'Radar data captured, frame: {self.data.frame}, time: {self.data.timestamp}')
         
         # 触发事件
         self.on_data_ready.set()
