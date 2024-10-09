@@ -70,11 +70,6 @@ class Context:
         else:
             self.logger.info('Context exit.')
         return None
-
-    @property
-    def initialized(self) -> bool:
-        """当前上下文是否已经通过 with 语句初始化."""
-        return self._initialized
     
     @property
     def client(self) -> carla.Client:
