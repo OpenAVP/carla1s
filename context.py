@@ -4,7 +4,7 @@ from typing import Optional, List, Union
 
 from .errors import ContextError
 from .utils import get_logger
-from .actors import ActorFactory, Actor
+from .actors import ActorFactory, Actor, Sensor
 from .registry import AvailableActors, AvailableMaps, AvailableVehicles, AvailableSensors, ActorTemplates
 from .tf import Transform
 
@@ -119,6 +119,7 @@ class Context:
         Returns:
             Context: 当前 Context 实例, 用于链式调用.
         """
+        self.stop_all_sensors()
         self.destroy_all_actors()
         self._client = None
         return self
@@ -225,3 +226,25 @@ class Context:
         """
         carla_tf = self.world.get_map().get_spawn_points()[index]
         return Transform.from_carla_transform_obj(carla_tf)
+
+    def listen_all_sensors(self) -> 'Context':
+        """监听所有传感器.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+        """
+        for actor in self.actors:
+            if isinstance(actor, Sensor):
+                actor.listen()
+        return self
+
+    def stop_all_sensors(self) -> 'Context':
+        """停止所有传感器.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+        """
+        for actor in self.actors:
+            if isinstance(actor, Sensor):
+                actor.stop()
+        return self
