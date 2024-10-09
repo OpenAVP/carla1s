@@ -241,3 +241,9 @@ class Actor:
         else:
             self.logger.warning(f"Trying to get transform of non-spawned actor. Return stored transform.")
             return self._transform
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.name})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
