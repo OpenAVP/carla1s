@@ -54,7 +54,8 @@ class Sensor(Actor):
 
     def stop(self) -> 'Sensor'  :
         """停止监听传感器数据."""
-        self.entity.stop()
+        if self.entity.is_listening:
+            self.entity.stop()
         self.logger.warning(f"Stop listening.")
         return self
     
