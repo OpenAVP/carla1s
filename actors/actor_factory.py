@@ -7,6 +7,8 @@ from .sensors.simple_lidar import SimpleLidar
 from .sensors.semantic_lidar import SemanticLidar
 from .sensors.simple_radar import SimpleRadar
 from .sensors.rgb_camera import RgbCamera
+from .sensors.depth_camera import DepthCamera
+from .sensors.semantic_camera import SemanticCamera
 from .actor_template import ActorTemplate
 from ..tf import Transform
 from ..utils import get_logger
@@ -123,6 +125,10 @@ class ActorFactory:
                 blueprint_name = 'sensor.lidar.ray_cast_semantic'
             elif actor_class is SimpleRadar:
                 blueprint_name = 'sensor.other.radar'
+            elif actor_class is DepthCamera:
+                blueprint_name = 'sensor.camera.depth'
+            elif actor_class is SemanticCamera:
+                blueprint_name = 'sensor.camera.semantic_segmentation'
         
         # 确定 blueprint_name 和 attributes
         if from_blueprint is not None:

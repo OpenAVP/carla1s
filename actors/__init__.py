@@ -7,6 +7,8 @@ from .sensors.rgb_camera import RgbCamera
 from .sensors.simple_lidar import SimpleLidar
 from .sensors.semantic_lidar import SemanticLidar
 from .sensors.simple_radar import SimpleRadar
+from .sensors.depth_camera import DepthCamera
+from .sensors.semantic_camera import SemanticCamera
 
 __all__ = [
     'Actor',
@@ -18,4 +20,6 @@ __all__ = [
     'SimpleLidar',
     'SemanticLidar',
     'SimpleRadar',
+    'DepthCamera',
+    'SemanticCamera',
 ]
