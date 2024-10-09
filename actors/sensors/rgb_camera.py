@@ -17,7 +17,6 @@ class RgbCamera(Sensor):
             (image.height, image.width, img.shape[0] // image.height // image.width)
         )
         img = img[:, :, :3]
-        img = img[:, :, ::-1]
         
         # 组装传感器数据
         self.data = SensorData(img, image.frame, image.timestamp, Transform.from_carla_transform_obj(image.transform))
