@@ -87,7 +87,7 @@ class Context:
         return self.client.get_world()
     
     @property
-    def actors(self) -> list:
+    def actors(self) -> List[Actor]:
         """当前上下文中的所有 Actor 实例."""
         return self._actors
     
@@ -122,7 +122,42 @@ class Context:
         self.destroy_all_actors()
         self._client = None
         return self
+    
+    def spawn_all_actors(self) -> 'Context':
+        """对所上下文中注册的执行 spawn 操作.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+        """
+        # 对 actors 列表依据父子关系重排, 构建关系树
+        actors_tree = dict()
+        for actor in self.actors:
+            if actor.parent is None:
+                actors_tree[actor] = []
+            else:
+                if actor.parent not in actors_tree:
+                    actors_tree[actor.parent] = []
+                actors_tree[actor.parent].append(actor)
+
+        # 按照树的层次结构重新排序 actors 列表
+        sorted_actors = []
+        def dfs(node):
+            sorted_actors.append(node)
+            for child in actors_tree.get(node, []):
+                dfs(child)
         
+        for root in [actor for actor in self.actors if actor.parent is None]:
+            dfs(root)
+
+        # 打印日志
+        self.logger.info(f'Spawn all actors with sequence: {sorted_actors}')
+
+        # 执行 spawn 操作
+        for actor in sorted_actors:
+            actor.spawn(self.world)
+        
+        return self
+    
     def destroy_all_actors(self) -> 'Context':
         """销毁当前上下文中的所有 Actor 实例.
 
