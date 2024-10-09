@@ -49,11 +49,13 @@ class Sensor(Actor):
     def listen(self) -> 'Sensor':
         """开始监听传感器数据."""
         self.entity.listen(self._callback)
+        self.logger.info(f"Begin listening.")
         return self
 
     def stop(self) -> 'Sensor'  :
         """停止监听传感器数据."""
         self.entity.stop()
+        self.logger.warning(f"Stop listening.")
         return self
     
     def _callback(self, data: carla.SensorData):
