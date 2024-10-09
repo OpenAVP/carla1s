@@ -16,6 +16,11 @@ class CoordConverter:
     #                                        [-1, 0, 0, 0],
     #                                        [0, -1, 0, 0],
     #                                        [0, 0, 0, 1]]))
+    
+    TF_TO_KITTI = Transform(matrix=np.array([[1, 0, 0, 0],
+                                             [0, -1, 0, 0],
+                                             [0, 0, 1, 0],
+                                             [0, 0, 0, 1]]))
 
     @classmethod
     def from_system(cls, *transform: Union[Transform, Point]) -> 'CoordConverter._CoordConverterStep':
