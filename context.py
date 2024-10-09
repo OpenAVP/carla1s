@@ -119,12 +119,12 @@ class Context:
         Returns:
             Context: 当前 Context 实例, 用于链式调用.
         """
-        self.stop_all_sensors()
-        self.destroy_all_actors()
+        self.all_sensors_stop()
+        self.all_actors_destroy()
         self._client = None
         return self
     
-    def spawn_all_actors(self) -> 'Context':
+    def all_actors_spawn(self) -> 'Context':
         """对所上下文中注册的执行 spawn 操作.
 
         Returns:
@@ -159,7 +159,7 @@ class Context:
         
         return self
     
-    def destroy_all_actors(self) -> 'Context':
+    def all_actors_destroy(self) -> 'Context':
         """销毁当前上下文中的所有 Actor 实例.
 
         Returns:
@@ -227,7 +227,7 @@ class Context:
         carla_tf = self.world.get_map().get_spawn_points()[index]
         return Transform.from_carla_transform_obj(carla_tf)
 
-    def listen_all_sensors(self) -> 'Context':
+    def all_sensors_listen(self) -> 'Context':
         """监听所有传感器.
 
         Returns:
@@ -238,7 +238,7 @@ class Context:
                 actor.listen()
         return self
 
-    def stop_all_sensors(self) -> 'Context':
+    def all_sensors_stop(self) -> 'Context':
         """停止所有传感器.
 
         Returns:
