@@ -132,7 +132,7 @@ class Transform:
                                rotation=carla.Rotation(yaw=self.yaw, pitch=self.pitch, roll=self.roll))
 
     def __str__(self) -> str:
-        return f'Transform(x:{self.x:.2f}, y:{self.y:.2f}, z:{self.z:.2f}, yaw:{self.yaw:.1f}, pitch:{self.pitch:.1f}, roll:{self.roll:.1f})'
+        return f'Transform(x={self.x:.2f}, y={self.y:.2f}, z={self.z:.2f}, yaw={self.yaw:.1f}, pitch={self.pitch:.1f}, roll={self.roll:.1f})'
 
     def __repr__(self) -> str:
         return self.__str__()
