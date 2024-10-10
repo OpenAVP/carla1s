@@ -12,7 +12,7 @@ class SensorData:
     """ 传感器数据类, 用于存储传感器数据."""
     
     def __init__(self, data: np.ndarray, frame: int, timestamp: float, transform: Transform) -> None:
-        self.data = data
+        self.content = data
         self.frame = frame
         self.timestamp = timestamp
         self.transform = transform
