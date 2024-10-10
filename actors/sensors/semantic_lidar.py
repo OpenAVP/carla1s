@@ -15,10 +15,13 @@ class SemanticLidar(Sensor):
         points = np.reshape(points, (points.shape[0] // 6, 6))
         
         # 提取语义标签
-        label = np.frombuffer(points[:, 5].tobytes(), dtype=np.uint32)
+        label = np.frombuffer(points[:, 5].tobytes(), dtype=np.uint32).copy()
         
-        # 组合点云数据和语义标签
-        points = np.concatenate((points[:, :3], label[:, None]), axis=1)
+        # 提取对象 ID
+        oid = np.frombuffer(points[:, 4].tobytes(), dtype=np.uint32).copy()
+        
+        # 重组数据
+        points = np.concatenate((points[:, :3], label[:, None], oid[:, None]), axis=1)
         
         # 组装传感器数据
         self.data = SensorData(points, lidar_data.frame, lidar_data.timestamp, Transform.from_carla_transform_obj(lidar_data.transform))
