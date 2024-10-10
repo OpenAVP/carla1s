@@ -73,7 +73,7 @@ class CoordConverter:
 
             # 遍历所有变换，并进行变换
             for data in self.data:
-                temp_matrix = transform.matrix.dot(data.matrix)
+                temp_matrix = np.linalg.inv(transform.matrix).dot(data.matrix)
                 temp_transform = Transform(matrix=temp_matrix)
                 new_data.append(temp_transform)
             self.data = new_data
