@@ -15,7 +15,7 @@ class DepthCamera(Sensor):
         image.convert(carla.ColorConverter.Depth)
         
         # 将深度图像数据转换为 numpy 数组
-        img = np.frombuffer(image.raw_data, dtype=np.uint8)
+        img = np.frombuffer(image.raw_data, dtype=np.uint8).copy()
         img = img.reshape(
             (image.height, image.width, img.shape[0] // image.height // image.width)
         )

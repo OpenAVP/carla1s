@@ -11,7 +11,7 @@ class SemanticLidar(Sensor):
         self.on_data_ready.clear()
         
         # 将激光雷达数据转换为 numpy 数组
-        points = np.frombuffer(lidar_data.raw_data, dtype=np.float32)
+        points = np.frombuffer(lidar_data.raw_data, dtype=np.float32).copy()
         points = np.reshape(points, (points.shape[0] // 6, 6))
         
         # 提取语义标签

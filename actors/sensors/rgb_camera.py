@@ -12,7 +12,7 @@ class RgbCamera(Sensor):
         self.on_data_ready.clear()
         
         # 将图像数据转换为 numpy 数组
-        img = np.frombuffer(image.raw_data, dtype=np.uint8)
+        img = np.frombuffer(image.raw_data, dtype=np.uint8).copy()
         img = img.reshape(
             (image.height, image.width, img.shape[0] // image.height // image.width)
         )
