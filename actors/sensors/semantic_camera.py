@@ -16,8 +16,10 @@ class SemanticCamera(Sensor):
         
         # 将语义分割图像数据转换为 numpy 数组
         img = np.frombuffer(image.raw_data, dtype=np.uint8)
-        img = img.reshape((image.height, image.width, 4))
-        img = img[:, :, :3]  # 去掉 alpha 通道
+        img = img.reshape(
+            (image.height, image.width, img.shape[0] // image.height // image.width)
+        )
+        img = img[:, :, :3]
         
         # 组装传感器数据
         self.data = SensorData(img, image.frame, image.timestamp, Transform.from_carla_transform_obj(image.transform))
