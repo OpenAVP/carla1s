@@ -120,7 +120,7 @@ class Actor:
         # 设置属性
         for key, value in self._attributes.items():
             try:
-                blueprint.set_attribute(key, value)
+                blueprint.set_attribute(key, str(value))
             except KeyError as e:
                 self.logger.warning(f"Failed to set attribute '{key}': {e}, ignored.")
                 continue
