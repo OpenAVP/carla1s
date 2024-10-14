@@ -1,5 +1,6 @@
 import carla
 import logging
+import time
 from typing import Optional, List, Union
 
 from .errors import ContextError
@@ -151,7 +152,9 @@ class Context:
         # 执行 spawn 操作
         for actor in sorted_actors:
             actor.spawn(self.world)
-        
+            # TODO: TEMPORARY SOLUTION FOR CARLA BUG
+            self.world.tick()
+            time.sleep(0.1)
         return self
     
     def all_actors_destroy(self) -> 'Context':
