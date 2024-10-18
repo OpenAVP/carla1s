@@ -130,20 +130,6 @@ class Transform:
         """
         return carla.Transform(location=carla.Location(x=self.x, y=self.y, z=self.z),
                                rotation=carla.Rotation(yaw=self.yaw, pitch=self.pitch, roll=self.roll))
-    
-    def change_orientation(self, R_matrix: np.ndarray) -> 'Transform':
-        """改变物体的坐标系方向
-
-        Args:
-            R_matrix: 目标坐标系相对于当前坐标系的3x3旋转矩阵
-        """
-        R = self.matrix[:3, :3]
-        t = self.matrix[:3, 3]
-        R = R_matrix.dot(R)
-        Rt = np.hstack((R, t.reshape(-1, 1)))
-        temp_matrix = np.vstack((Rt, np.array([0, 0, 0, 1])))
-        self.matrix = temp_matrix
-        return self
 
     def __str__(self) -> str:
         return f'Transform(x={self.x:.2f}, y={self.y:.2f}, z={self.z:.2f}, yaw={self.yaw:.1f}, pitch={self.pitch:.1f}, roll={self.roll:.1f})'
