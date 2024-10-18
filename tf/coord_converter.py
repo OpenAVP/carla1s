@@ -11,15 +11,14 @@ class CoordConverter:
         TF_TO_ROS: 预定义的从 CARLA 到 ROS 的变换矩阵
     """
 
-    # TODO: AI GENERATED CODE, VERIFY IT!
-    # TF_TO_ROS = Transform(matrix=np.array([[0, 0, 1, 0],
-    #                                        [-1, 0, 0, 0],
-    #                                        [0, -1, 0, 0],
-    #                                        [0, 0, 0, 1]]))
-    
-    CARLA_TO_KITTI = np.array([[0, 0, 1],
-                               [1, 0, 0],
-                               [0, -1, 0]])
+    CARLA_CAM_TO_KITTI_CAM_ORIENTATION = Transform(matrix=np.array([[0, 0, 1, 0],
+                                                        [1, 0, 0, 0],
+                                                        [0, -1, 0, 0],
+                                                        [0, 0, 0, 1]]))
+    LEFT_HANDED_TO_RIGHT_HANDED_ORIENTATION = Transform(matrix=np.array([[1, 0, 0, 0],
+                                                                      [0, -1, 0, 0],
+                                                                      [0, 0, 1, 0],
+                                                                      [0, 0, 0, 1]]))
 
     @classmethod
     def from_system(cls, *transform: Union[Transform, Point]) -> 'CoordConverter._CoordConverterStep':
