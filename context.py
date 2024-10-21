@@ -51,6 +51,7 @@ class Context:
         self.available_vehicles = AvailableVehicles
         self.available_sensors = AvailableSensors
         self.actor_templates = ActorTemplates
+
     def __enter__(self) -> 'Context':
         # 尝试连接到 CARLA 服务端
         try:
