@@ -202,14 +202,22 @@ class Context:
             map_name = map_name.value
         
         # 重新加载世界, settings 与 Executor 有关，不重置
+        self.client.set_timeout(10)
         if map_name is not None:
             self.client.load_world(map_name, reset_settings=False)
         else:
             self.client.reload_world(reset_settings=False)
+
+        # 如果在同步模式,执行一次 tick
+        if self.world.get_settings().synchronous_mode:
+            self.world.tick()
+            
+        # 恢复超时时间
+        self.client.set_timeout(self._timeout_sec)
             
         # 重置 Actor 列表
         if reset_actor_list:
-            self._actors = list()
+            self._actors.clear()
 
         return self
 
