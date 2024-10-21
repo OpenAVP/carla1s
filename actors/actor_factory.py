@@ -11,7 +11,7 @@ from .sensors.depth_camera import DepthCamera
 from .sensors.semantic_camera import SemanticCamera
 from .actor_template import ActorTemplate
 from ..tf import Transform
-from ..utils import get_logger
+from ..utils.logging import get_logger
 
 
 T = TypeVar('T', bound=Actor)
