@@ -153,7 +153,6 @@ class Context:
         # 执行 spawn 操作
         for actor in sorted_actors:
             actor.spawn(self.world)
-            # TODO: TEMPORARY SOLUTION FOR CARLA BUG
             self.world.tick()
             time.sleep(0.1)
         return self
