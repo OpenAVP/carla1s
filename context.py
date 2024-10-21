@@ -4,7 +4,7 @@ import time
 from typing import Optional, List, Union
 
 from .errors import ContextError
-from .utils import get_logger
+from .utils.logging import get_logger
 from .actors import ActorFactory, Actor, Sensor
 from .registry import AvailableActors, AvailableMaps, AvailableVehicles, AvailableSensors, ActorTemplates
 from .tf import Transform

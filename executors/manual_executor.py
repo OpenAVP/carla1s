@@ -4,7 +4,7 @@ from threading import Thread, Event
 
 from ..context import Context
 from ..errors import ExecutorError
-from ..utils import ProgressLogger
+from ..utils.logging import ProgressLogger
 from .executor import Executor
 
 

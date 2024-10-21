@@ -1,11 +1,10 @@
 import carla
 import uuid
-import logging
 from typing import Optional, Dict
 
 from ..errors import ContextError, CarlaError
 from ..tf import Transform
-from ..utils import get_logger
+from ..utils.logging import get_logger
 
 
 class Actor:
