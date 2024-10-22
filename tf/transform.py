@@ -105,6 +105,16 @@ class Transform:
         """物体绕 X 轴旋转的欧拉角, 单位度, 由变换矩阵计算得到"""
         return np.rad2deg(np.arctan2(self.matrix[2, 1], self.matrix[2, 2])).item()
 
+    @property
+    def quaternion(self) -> np.ndarray:
+        """物体的四元数表示, 4x1 的矩阵"""
+        m = self.matrix[:3, :3]
+        qw = np.sqrt(1.0 + m[0, 0] + m[1, 1] + m[2, 2]) / 2.0
+        qx = (m[2, 1] - m[1, 2]) / (4.0 * qw)
+        qy = (m[0, 2] - m[2, 0]) / (4.0 * qw)
+        qz = (m[1, 0] - m[0, 1]) / (4.0 * qw)
+        return np.array([qw, qx, qy, qz])
+
     @classmethod
     def from_carla_transform_obj(cls, transform: carla.Transform) -> 'Transform':
         """从 CARLA 的变换对象创建 Transform 实例.
