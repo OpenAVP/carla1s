@@ -109,10 +109,33 @@ class Transform:
     def quaternion(self) -> np.ndarray:
         """物体的四元数表示, 4x1 的矩阵"""
         m = self.matrix[:3, :3]
-        qw = np.sqrt(1.0 + m[0, 0] + m[1, 1] + m[2, 2]) / 2.0
-        qx = (m[2, 1] - m[1, 2]) / (4.0 * qw)
-        qy = (m[0, 2] - m[2, 0]) / (4.0 * qw)
-        qz = (m[1, 0] - m[0, 1]) / (4.0 * qw)
+        trace = np.trace(m)
+        if trace > 0:
+            s = 0.5 / np.sqrt(trace + 1.0)
+            qw = 0.25 / s
+            qx = (m[2, 1] - m[1, 2]) * s
+            qy = (m[0, 2] - m[2, 0]) * s
+            qz = (m[1, 0] - m[0, 1]) * s
+        else:
+            if m[0, 0] > m[1, 1] and m[0, 0] > m[2, 2]:
+                s = 2.0 * np.sqrt(1.0 + m[0, 0] - m[1, 1] - m[2, 2])
+                qw = (m[2, 1] - m[1, 2]) / s
+                qx = 0.25 * s
+                qy = (m[0, 1] + m[1, 0]) / s
+                qz = (m[0, 2] + m[2, 0]) / s
+            elif m[1, 1] > m[2, 2]:
+                s = 2.0 * np.sqrt(1.0 + m[1, 1] - m[0, 0] - m[2, 2])
+                qw = (m[0, 2] - m[2, 0]) / s
+                qx = (m[0, 1] + m[1, 0]) / s
+                qy = 0.25 * s
+                qz = (m[1, 2] + m[2, 1]) / s
+            else:
+                s = 2.0 * np.sqrt(1.0 + m[2, 2] - m[0, 0] - m[1, 1])
+                qw = (m[1, 0] - m[0, 1]) / s
+                qx = (m[0, 2] + m[2, 0]) / s
+                qy = (m[1, 2] + m[2, 1]) / s
+                qz = 0.25 * s
+
         return np.array([qw, qx, qy, qz])
 
     @classmethod
