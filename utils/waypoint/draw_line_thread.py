@@ -17,6 +17,10 @@ class DrawInCarlaThread:
         self.default_point_height = default_point_height
         self.use_z = use_z
         self.floor_height = floor_height
+        self.drawing = True
+
+    def set_whether_draw(self, draw):
+        self.drawing = draw
 
     def draw_in_carla_thread(self):
         """实现绘图进程"""
@@ -92,31 +96,32 @@ class DrawInCarlaThread:
     def draw_in_carla(self, reference_points):
         debug = self.world.debug
 
-        # 绘制参考点
-        for point in reference_points:
-            if self.use_z:
-                debug.draw_point(carla.Location(x=point[0], y=point[1], z=point[2]), size=0.08, color=carla.Color(r=255, g=0, b=0), life_time=self.interval*2)
-            else:
-                debug.draw_point(carla.Location(x=point[0], y=point[1], z=self.floor_height), size=0.08, color=carla.Color(r=255, g=0, b=0), life_time=self.interval*2)
-        
-        # 绘制连线
-        for i in range(len(reference_points) - 1):
-            if self.use_z:
-                debug.draw_line(
-                    carla.Location(x=reference_points[i][0], y=reference_points[i][1], z=reference_points[i][2]),
-                    carla.Location(x=reference_points[i + 1][0], y=reference_points[i + 1][1], z=reference_points[i + 1][2]),
-                    thickness=0.1,
-                    color=carla.Color(r=255, g=0, b=0),
-                    life_time = self.interval*2
-                )
-            else:
-                debug.draw_line(
-                    carla.Location(x=reference_points[i][0], y=reference_points[i][1], z=self.floor_height),
-                    carla.Location(x=reference_points[i + 1][0], y=reference_points[i + 1][1], z=self.floor_height),
-                    thickness=0.1,
-                    color=carla.Color(r=255, g=0, b=0),
-                    life_time = self.interval*2
-                )
+        if self.drawing == True:
+            # 绘制参考点
+            for point in reference_points:
+                if self.use_z:
+                    debug.draw_point(carla.Location(x=point[0], y=point[1], z=point[2]), size=0.08, color=carla.Color(r=255, g=0, b=0), life_time=self.interval*2)
+                else:
+                    debug.draw_point(carla.Location(x=point[0], y=point[1], z=self.floor_height), size=0.08, color=carla.Color(r=255, g=0, b=0), life_time=self.interval*2)
+            
+            # 绘制连线
+            for i in range(len(reference_points) - 1):
+                if self.use_z:
+                    debug.draw_line(
+                        carla.Location(x=reference_points[i][0], y=reference_points[i][1], z=reference_points[i][2]),
+                        carla.Location(x=reference_points[i + 1][0], y=reference_points[i + 1][1], z=reference_points[i + 1][2]),
+                        thickness=0.1,
+                        color=carla.Color(r=255, g=0, b=0),
+                        life_time = self.interval*2
+                    )
+                else:
+                    debug.draw_line(
+                        carla.Location(x=reference_points[i][0], y=reference_points[i][1], z=self.floor_height),
+                        carla.Location(x=reference_points[i + 1][0], y=reference_points[i + 1][1], z=self.floor_height),
+                        thickness=0.1,
+                        color=carla.Color(r=255, g=0, b=0),
+                        life_time = self.interval*2
+                    )
 
     def update_line_points(self, line_points):
         with self.lock:
@@ -152,7 +157,7 @@ class DrawInCarlaThread:
         """
         计算pygame坐标系下的点在Carla中的对应点高度
 
-        point               --  pygame坐标系下的点(x,y)
+        point               --  pygame坐标系下的点(x, y)
         camera_transform    --  相机transform矩阵
         z                   --  Carla中对应点高度
         """
