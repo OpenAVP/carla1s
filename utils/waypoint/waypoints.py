@@ -1,13 +1,13 @@
 import numpy as np
-import math
 from typing import List, Union
-from .follow_waypoint_control import Follow_Waypoint_Controller
-from .pure_pursuit import SimpleTest
 from ...tf import Transform
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 class Waypoints:
     def __init__(self, 
-                 sequence: Union[List[Transform], np.ndarray],
+                 sequence: Union[List[Transform], np.ndarray, str],
                  *,
                  delta_seconds: float,
                  forward: bool = True,
@@ -19,21 +19,15 @@ class Waypoints:
         self.forward = forward
         self._threshold = 1
         self._target_dis = 0.2
-        self._ori_yaw = 0
-        self._sequence = self._smoothing(sequence)
+
+        self._sequence = self._check_format(sequence)
         
     def __len__(self):
-        if isinstance(self._sequence, list):
-            return len(self._sequence)
-        elif isinstance(self._sequence, np.array):
-            return self._sequence.shape[0]
+        return self._sequence.shape[0]-1
     
     def __getitem__(self, index: int):
         item = self._sequence[index]
-        if isinstance(item, Transform):
-            return item
-        elif isinstance(item, np.array):
-            return Transform(x=item[0], y=item[1], z=item[2], pitch=item[3], yaw=item[4], roll=item[5])
+        return Transform(x=item[0], y=item[1], z=item[2], pitch=item[3], yaw=item[4], roll=item[5])
     
     def __iter__(self):
         return self
@@ -51,14 +45,9 @@ class Waypoints:
             else:
                 self._iter_index = len(self)
 
-        waypoint = self._sequence[self._iter_index]
+        waypoint = self[self._iter_index]
         self._iter_index += 1
-
-        if isinstance(waypoint, Transform):
-            return waypoint
-        elif isinstance(waypoint, np.array):
-            waypoint = Transform(x=waypoint[0], y=waypoint[1], z=waypoint[2], pitch=waypoint[3], yaw=waypoint[4], roll=waypoint[5])
-            return waypoint
+        return waypoint
 
     @property
     def data(self):
@@ -70,100 +59,94 @@ class Waypoints:
     def next(self) -> Transform:
         return next(self)
 
-    def _smoothing(self, sequence: Union[List[Transform], np.ndarray]) -> np.ndarray:
-        """对路径点进行平滑操作
+    @classmethod
+    def read_data(cls, read_path):
+        """读取npy文件保存的车辆Transform和时间戳信息
+
+        Args:
+            read_path (str): .npy文件路径
+        Returns:
+            transform (np.ndarray): 车辆Transform信息,格式为(x, y, z, pitch, yaw, roll).
+            time_stamp (np.ndarray): 车辆时间戳信息,格式为(frame, elapsed_seconds, delta_seconds, platform_timestamp).
+        """
+        data = np.load(read_path, allow_pickle=True)
+        data = data.reshape(-1, 10)
+
+        # 拆分Transform和时间戳
+        transform = data[:,:6]
+        time_stamp = data[:,-4:]
+
+        return transform, time_stamp
+
+    @classmethod
+    def interpolate(cls, transform, time_stamp, dT, threshold = 10):
+        """根据给定的时间间隔插值读取车辆Transform信息
+
+        Args:
+            transform (np.ndarray): 车辆Transform信息,格式为(x, y, z, pitch, yaw, roll).
+            time_stamp (np.ndarray): 车辆时间戳信息,格式为(frame, elapsed_seconds, delta_seconds, platform_timestamp).
+            dT (float): 读取数据时间间隔
+
+        Returns:
+            x_interpolated (np.ndarray): 路径x坐标.
+            y_interpolated (np.ndarray): 路径y坐标.
+            z_interpolated (np.ndarray): 路径z坐标.
+            pitch_interpolated (np.ndarray): 路径pitch角.
+            yaw_interpolated (np.ndarray): 路径yaw角.
+            roll_interpolated (np.ndarray): 路径roll角.
+        """
+        time_stamp = time_stamp[:,1]
+        time_stamp[:] -= time_stamp[0]
+
+        len = transform.shape[0]
+        time_end = time_stamp[len-1]
+
+        # 按照生成新的时间戳
+        new_len = int(time_end / dT)
+        new_time_stamp = np.arange(0, new_len * dT, dT)
+
+        x = transform[:,0]
+        y = transform[:,1]
+        z = transform[:,2]
+        pitch = transform[:,3]
+        yaw = transform[:,4]
+        roll = transform[:,5]
+
+        # 插值平滑
+        x_interpolated = np.interp(new_time_stamp, time_stamp, x)
+        y_interpolated = np.interp(new_time_stamp, time_stamp, y)
+        z_interpolated = np.interp(new_time_stamp, time_stamp, z) - 0.05
+        pitch_interpolated = np.interp(new_time_stamp, time_stamp, pitch)
+        yaw_interpolated = np.interp(new_time_stamp, time_stamp, yaw)
+        roll_interpolated = np.interp(new_time_stamp, time_stamp, roll)
+
+        plt.plot(x,y,color='orange',marker='o',label='before',markersize=1,linewidth=0.1)
+        plt.savefig("before.png")
+        plt.plot(x_interpolated,y_interpolated,color='blue',marker='o',label='after',markersize=1,linewidth=0.1)
+        plt.savefig("after.png")
+        plt.xlabel("x")
+        plt.ylabel("y")
+
+        # 清除部分插值结果以适应Carla仿真器的yaw角表示法
+        for i in range(1,new_len-1):
+            if abs(yaw_interpolated[i] - yaw_interpolated[i-1]) > threshold and abs(yaw_interpolated[i] - yaw_interpolated[i+1]) > threshold :
+                yaw_interpolated[i] = yaw_interpolated[i-1]
+
+        return x_interpolated, y_interpolated, z_interpolated, pitch_interpolated, yaw_interpolated, roll_interpolated
+
+    def _check_format(self, sequence: Union[List[Transform], np.ndarray]) -> np.ndarray:
+        """检查路径点格式
 
         Args:
             sequence (np.ndarray/List[Transform]): 路径点序列.
 
         Returns:
-            sequence (np.ndarray): 平滑后的路径点序列.
+            sequence (np.ndarray): 格式转换后的路径点序列.
         """
         if isinstance(sequence, list):
             transform_list = [[sequence[i].x, sequence[i].y, sequence[i].z, sequence[i].pitch, sequence[i].yaw, sequence[i].roll, 0, i * self._delta_seconds, 0, 0] for i in range(0,len(sequence))]
             sequence = np.array(transform_list)
-            sequence = self._up_sampling(sequence)
-            sequence = self._pure_pursuit(sequence)
-        elif isinstance(sequence, np.array):
 
-            # 输入的sequence格式：x y z pitch yaw roll frame elapsed_seconds delta_seconds platform_timestamp
-            sequence = self._up_sampling(sequence)
-            sequence = self._pure_pursuit(sequence)
-        return sequence
-
-    def _up_sampling(self, sequence: np.ndarray, save = False) -> np.ndarray:
-        """对路径点进行上采样
-
-        Args:
-            sequence (np.ndarray): 路径点序列.
-            save (bool): 是否保存上采样后的路径点序列.
-
-        Returns:
-            (np.ndarray): 上采样后的路径点序列.
-        """
-        transform = sequence[:,:6]
-        time_stamp = sequence[:,-4:]
-        temp_x, temp_y, z, pitch, yaw, roll = SimpleTest.interpolate(transform, time_stamp, self._delta_seconds)
-
-        # 考虑到参考路径点可能过于稀疏，进行上采样，以方便PurePursuit算法追踪
-        path_length = 0
-        x_ = []
-        y_ = []
-        for i in range(0,len(temp_x)-1):
-            dis = math.sqrt((temp_x[i]-temp_x[i+1])*(temp_x[i]-temp_x[i+1])+(temp_y[i]-temp_y[i+1])*(temp_y[i]-temp_y[i+1]))
-            path_length += dis
-            if dis > self._threshold:
-                target_dis = self._target_dis
-                target_points_num = int(dis / target_dis) + 1
-
-                xp = np.array([temp_x[i],temp_x[i+1]])
-                yp = np.array([temp_y[i],temp_y[i+1]])
-
-                xn = np.linspace(temp_x[i], temp_x[i+1], target_points_num)
-                yn = np.interp(xn, xp, yp)
-
-                x_.extend(xn.tolist())
-                y_.extend(yn.tolist())
-            else:
-                x_.append(temp_x[i])
-                y_.append(temp_y[i])
-
-        x = np.array(x_)
-        y = np.array(y_)
-        self._path_length = path_length
-
-        yaw = Follow_Waypoint_Controller.calculate_yaws(x,y)
-        self._ori_yaw = yaw[0]
-        if save == True:
-            self._sequence = [Transform(x=x, y=y, z=0, pitch=0, yaw=yaw, roll=0) for x, y, yaw in zip(x, y, yaw)]
-        return np.concatenate((x.reshape(-1,1), y.reshape(-1,1)), axis = 1)
-    
-    def _pure_pursuit(self, sequence: np.ndarray, forward = True, save = False) -> np.ndarray:
-        """执行PurePursuit算法生成行驶轨迹
-
-        Args:
-            sequence (np.ndarray): 路径点序列.
-            forward (bool): 轨迹中自车是否向前行驶.
-            save (bool): 是否保存上采样后的路径点序列.
-
-        Returns:
-            sequence (np.ndarray): 车辆行驶的waypoints序列.
-        """
-        if forward == True:
-            v = 1
-        else:
-            v = -1
-        state = np.array([sequence[0][0], sequence[0][1], np.radians(self._ori_yaw), v]).astype(np.float64)
-        test = SimpleTest(initial_state = state)
-        new_path = test.offline_test(sequence, math.floor(self._path_length/(v*self._delta_seconds))-1)
-
-        x = [state[0] for state in new_path]
-        y = [state[1] for state in new_path]
-        yaw = [np.degrees(state[2]) for state in new_path]
-
-        sequence = [Transform(x=x, y=y, z=0, pitch=0, yaw=yaw, roll=0) for x, y, yaw in zip(x, y, yaw)]
-        if save == True:
-            self._sequence = sequence
         return sequence
 
     @classmethod
@@ -184,9 +167,10 @@ class Waypoints:
         Returns:
             waypoints (Waypoints): 读取到的路径点序列.
         """
-        transform, time_stamp = SimpleTest.read_data(file_path)
-        x, y, z, pitch, yaw, roll = SimpleTest.interpolate(transform, time_stamp, delta_seconds)
-
-        sequence = [Transform(x=x, y=y, z=z, pitch=pitch, yaw=yaw, roll=roll) for x, y, z, pitch, yaw, roll in zip(x, y, z, pitch, yaw, roll)]
+        transform, time_stamp = Waypoints.read_data(file_path)
+        x, y, z, pitch, yaw, roll = Waypoints.interpolate(transform, time_stamp, delta_seconds)
+        sequence = np.array([(x, y, 0, 0, yaw, 0) for x, y, yaw in zip(x, y, yaw)])
         waypoints = Waypoints(sequence = sequence, delta_seconds = delta_seconds)
         return waypoints
+    
+
