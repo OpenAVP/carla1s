@@ -115,7 +115,7 @@ class Waypoints:
         # 插值平滑
         x_interpolated = np.interp(new_time_stamp, time_stamp, x)
         y_interpolated = np.interp(new_time_stamp, time_stamp, y)
-        z_interpolated = np.interp(new_time_stamp, time_stamp, z) - 0.05
+        z_interpolated = np.interp(new_time_stamp, time_stamp, z)
         pitch_interpolated = np.interp(new_time_stamp, time_stamp, pitch)
         yaw_interpolated = np.interp(new_time_stamp, time_stamp, yaw)
         roll_interpolated = np.interp(new_time_stamp, time_stamp, roll)
@@ -169,8 +169,9 @@ class Waypoints:
         """
         transform, time_stamp = Waypoints.read_data(file_path)
         x, y, z, pitch, yaw, roll = Waypoints.interpolate(transform, time_stamp, delta_seconds)
-        sequence = np.array([(x, y, 0, 0, yaw, 0) for x, y, yaw in zip(x, y, yaw)])
+        sequence = np.array([(x, y, z, pitch, yaw, 0) for x, y, z, pitch, yaw in zip(x, y, z, pitch, yaw)])
         waypoints = Waypoints(sequence = sequence, delta_seconds = delta_seconds)
         return waypoints
     
+
 
