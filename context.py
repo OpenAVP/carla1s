@@ -1,10 +1,11 @@
 import carla
 import logging
+import time
 from typing import Optional, List, Union
 
 from .errors import ContextError
-from .utils import get_logger
-from .actors import ActorFactory, Actor
+from .utils.logging import get_logger
+from .actors import ActorFactory, Actor, Sensor
 from .registry import AvailableActors, AvailableMaps, AvailableVehicles, AvailableSensors, ActorTemplates
 from .tf import Transform
 
@@ -50,6 +51,7 @@ class Context:
         self.available_vehicles = AvailableVehicles
         self.available_sensors = AvailableSensors
         self.actor_templates = ActorTemplates
+
     def __enter__(self) -> 'Context':
         # 尝试连接到 CARLA 服务端
         try:
@@ -70,11 +72,6 @@ class Context:
         else:
             self.logger.info('Context exit.')
         return None
-
-    @property
-    def initialized(self) -> bool:
-        """当前上下文是否已经通过 with 语句初始化."""
-        return self._initialized
     
     @property
     def client(self) -> carla.Client:
@@ -87,7 +84,7 @@ class Context:
         return self.client.get_world()
     
     @property
-    def actors(self) -> list:
+    def actors(self) -> List[Actor]:
         """当前上下文中的所有 Actor 实例."""
         return self._actors
     
@@ -119,11 +116,48 @@ class Context:
         Returns:
             Context: 当前 Context 实例, 用于链式调用.
         """
-        self.destroy_all_actors()
+        self.all_sensors_stop()
+        self.all_actors_destroy()
         self._client = None
         return self
+    
+    def all_actors_spawn(self) -> 'Context':
+        """对所上下文中注册的执行 spawn 操作.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+        """
+        # 对 actors 列表依据父子关系重排, 构建关系树
+        actors_tree = dict()
+        for actor in self.actors:
+            if actor.parent is None:
+                actors_tree[actor] = []
+            else:
+                if actor.parent not in actors_tree:
+                    actors_tree[actor.parent] = []
+                actors_tree[actor.parent].append(actor)
+
+        # 按照树的层次结构重新排序 actors 列表
+        sorted_actors = []
+        def dfs(node):
+            sorted_actors.append(node)
+            for child in actors_tree.get(node, []):
+                dfs(child)
         
-    def destroy_all_actors(self) -> 'Context':
+        for root in [actor for actor in self.actors if actor.parent is None]:
+            dfs(root)
+
+        # 打印日志
+        self.logger.info(f'Spawn all actors with sequence: {sorted_actors}')
+
+        # 执行 spawn 操作
+        for actor in sorted_actors:
+            actor.spawn(self.world)
+            self.world.tick()
+            time.sleep(0.1)
+        return self
+    
+    def all_actors_destroy(self) -> 'Context':
         """销毁当前上下文中的所有 Actor 实例.
 
         Returns:
@@ -168,14 +202,22 @@ class Context:
             map_name = map_name.value
         
         # 重新加载世界, settings 与 Executor 有关，不重置
+        self.client.set_timeout(10)
         if map_name is not None:
             self.client.load_world(map_name, reset_settings=False)
-        else:
-            self.client.reload_world(reset_settings=False)
+        # else:
+        #     self.client.reload_world(reset_settings=False)
+
+        # 如果在同步模式,执行一次 tick
+        if self.world.get_settings().synchronous_mode:
+            self.world.tick()
+            
+        # 恢复超时时间
+        self.client.set_timeout(self._timeout_sec)
             
         # 重置 Actor 列表
         if reset_actor_list:
-            self._actors = list()
+            self._actors.clear()
 
         return self
 
@@ -190,3 +232,25 @@ class Context:
         """
         carla_tf = self.world.get_map().get_spawn_points()[index]
         return Transform.from_carla_transform_obj(carla_tf)
+
+    def all_sensors_listen(self) -> 'Context':
+        """监听所有传感器.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+        """
+        for actor in self.actors:
+            if isinstance(actor, Sensor):
+                actor.listen()
+        return self
+
+    def all_sensors_stop(self) -> 'Context':
+        """停止所有传感器.
+
+        Returns:
+            Context: 当前 Context 实例, 用于链式调用.
+        """
+        for actor in self.actors:
+            if isinstance(actor, Sensor):
+                actor.stop()
+        return self

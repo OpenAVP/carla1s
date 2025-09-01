@@ -12,7 +12,7 @@ class SensorData:
     """ 传感器数据类, 用于存储传感器数据."""
     
     def __init__(self, data: np.ndarray, frame: int, timestamp: float, transform: Transform) -> None:
-        self.data = data
+        self.content = data
         self.frame = frame
         self.timestamp = timestamp
         self.transform = transform
@@ -49,11 +49,14 @@ class Sensor(Actor):
     def listen(self) -> 'Sensor':
         """开始监听传感器数据."""
         self.entity.listen(self._callback)
+        self.logger.info(f"Begin listening.")
         return self
 
     def stop(self) -> 'Sensor'  :
         """停止监听传感器数据."""
-        self.entity.stop()
+        if self.entity and self.entity.is_listening:
+            self.entity.stop()
+        self.logger.warning(f"Stop listening.")
         return self
     
     def _callback(self, data: carla.SensorData):

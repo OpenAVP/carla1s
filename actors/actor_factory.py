@@ -7,14 +7,25 @@ from .sensors.simple_lidar import SimpleLidar
 from .sensors.semantic_lidar import SemanticLidar
 from .sensors.simple_radar import SimpleRadar
 from .sensors.rgb_camera import RgbCamera
+from .sensors.depth_camera import DepthCamera
+from .sensors.semantic_camera import SemanticCamera
 from .actor_template import ActorTemplate
 from ..tf import Transform
-from ..utils import get_logger
+from ..utils.logging import get_logger
 
 
 T = TypeVar('T', bound=Actor)
 
 class ActorFactory:
+    
+    ACTOR_CLASS_TO_BLUEPRINT = {
+        RgbCamera: 'sensor.camera.rgb',
+        SimpleLidar: 'sensor.lidar.ray_cast',
+        SemanticLidar: 'sensor.lidar.ray_cast_semantic',
+        SimpleRadar: 'sensor.other.radar',
+        DepthCamera: 'sensor.camera.depth',
+        SemanticCamera: 'sensor.camera.semantic_segmentation'
+    }
     
     def __init__(self, ref_actor_list: List[Actor]) -> None:
         self._ref_actor_list = ref_actor_list
@@ -115,15 +126,8 @@ class ActorFactory:
         
         # 对精确类进行豁免, 要求双空
         if from_blueprint is None and from_template is None:
-            if actor_class is RgbCamera:
-                blueprint_name = 'sensor.camera.rgb'
-            elif actor_class is SimpleLidar:
-                blueprint_name = 'sensor.lidar.ray_cast'
-            elif actor_class is SemanticLidar:
-                blueprint_name = 'sensor.lidar.ray_cast_semantic'
-            elif actor_class is SimpleRadar:
-                blueprint_name = 'sensor.other.radar'
-        
+            blueprint_name = self.ACTOR_CLASS_TO_BLUEPRINT.get(actor_class)
+
         # 确定 blueprint_name 和 attributes
         if from_blueprint is not None:
             if isinstance(from_blueprint, Enum):

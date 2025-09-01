@@ -1,11 +1,10 @@
 import carla
 import uuid
-import logging
 from typing import Optional, Dict
 
 from ..errors import ContextError, CarlaError
 from ..tf import Transform
-from ..utils import get_logger
+from ..utils.logging import get_logger
 
 
 class Actor:
@@ -120,7 +119,7 @@ class Actor:
         # 设置属性
         for key, value in self._attributes.items():
             try:
-                blueprint.set_attribute(key, value)
+                blueprint.set_attribute(key, str(value))
             except KeyError as e:
                 self.logger.warning(f"Failed to set attribute '{key}': {e}, ignored.")
                 continue
@@ -198,7 +197,7 @@ class Actor:
             Actor: 当前 Actor 对象, 用于链式调用
         """
         if self.is_alive:
-            self.entity.set_enable_physics(option)
+            self.entity.set_simulate_physics(option)
             self.logger.info(f'Set actor physics to {option}.')
         else:
             self._setup['set_physics'] = option
@@ -241,3 +240,9 @@ class Actor:
         else:
             self.logger.warning(f"Trying to get transform of non-spawned actor. Return stored transform.")
             return self._transform
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.name})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
