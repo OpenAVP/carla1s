@@ -205,8 +205,8 @@ class Context:
         self.client.set_timeout(10)
         if map_name is not None:
             self.client.load_world(map_name, reset_settings=False)
-        else:
-            self.client.reload_world(reset_settings=False)
+        # else:
+        #     self.client.reload_world(reset_settings=False)
 
         # 如果在同步模式,执行一次 tick
         if self.world.get_settings().synchronous_mode:

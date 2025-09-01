@@ -197,7 +197,7 @@ class Actor:
             Actor: 当前 Actor 对象, 用于链式调用
         """
         if self.is_alive:
-            self.entity.set_enable_physics(option)
+            self.entity.set_simulate_physics(option)
             self.logger.info(f'Set actor physics to {option}.')
         else:
             self._setup['set_physics'] = option
